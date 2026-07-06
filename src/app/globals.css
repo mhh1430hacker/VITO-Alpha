@@ -1,0 +1,283 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 215 28% 5.5%;
+    --foreground: 210 40% 96%;
+    --card: 217 22% 11.6%;
+    --card-foreground: 210 40% 96%;
+    --popover: 217 22% 11.6%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 255 92% 76%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 26% 9%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 215 26% 12%;
+    --muted-foreground: 215 16% 55%;
+    --accent: 215 26% 14%;
+    --accent-foreground: 210 40% 96%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 215 22% 21.2%;
+    --input: 215 22% 21.2%;
+    --ring: 255 92% 76%;
+    --radius: 1rem;
+
+    --violet-50: #F3F0FF;
+    --violet-100: #E8E0FF;
+    --violet-200: #D1C0FF;
+    --violet-300: #BBA0FF;
+    --violet-400: #9470FF;
+    --violet-500: #6C3BF5;
+    --violet-600: #5A2ED4;
+    --violet-700: #4822B3;
+    --violet-800: #361792;
+    --violet-900: #240B71;
+    --violet-950: #16054A;
+
+    --amber-50: #FFF9E6;
+    --amber-100: #FFEEB8;
+    --amber-200: #FFE38A;
+    --amber-300: #FFD85C;
+    --amber-400: #FFCD3A;
+    --amber-500: #F5A623;
+    --amber-600: #D98E1A;
+    --amber-700: #BD7611;
+    --amber-800: #A15E08;
+    --amber-900: #854600;
+    --amber-950: #5C2E00;
+
+    --gold-50: #FFFDF0;
+    --gold-100: #FFFAD4;
+    --gold-200: #FFF3A8;
+    --gold-300: #FFEA7C;
+    --gold-400: #FFDD50;
+    --gold-500: #D4A72C;
+    --gold-600: #B8911E;
+    --gold-700: #9C7B14;
+    --gold-800: #80650A;
+    --gold-900: #644F04;
+    --gold-950: #3D3000;
+
+    --teal-50: #E6FFFA;
+    --teal-100: #B2F5EA;
+    --teal-200: #81E6D9;
+    --teal-300: #4FD1C5;
+    --teal-400: #38B2AC;
+    --teal-500: #14B8A6;
+    --teal-600: #0D9488;
+    --teal-700: #0F766E;
+    --teal-800: #115E59;
+    --teal-900: #134E4A;
+    --teal-950: #042F2E;
+
+    --rose-50: #FFF1F2;
+    --rose-100: #FFE4E6;
+    --rose-200: #FECDD3;
+    --rose-300: #FDA4AF;
+    --rose-400: #FB7185;
+    --rose-500: #F43F5E;
+    --rose-600: #E11D48;
+    --rose-700: #BE123C;
+    --rose-800: #9F1239;
+    --rose-900: #881337;
+    --rose-950: #4C0519;
+
+    --chart-1: #9470FF;
+    --chart-2: #D4A72C;
+    --chart-3: #14B8A6;
+    --chart-4: #F43F5E;
+    --chart-5: #8B5CF6;
+    --chart-6: #34D399;
+    --chart-7: #F97316;
+    --chart-8: #06B6D4;
+    --chart-9: #EC4899;
+    --chart-10: #84CC16;
+    --chart-11: #6366F1;
+    --chart-12: #EAB308;
+
+    --glass-bg: rgba(10, 13, 18, 0.6);
+    --glass-bg-strong: rgba(10, 13, 18, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-blur: 20px;
+
+    --elevation-0: none;
+    --elevation-1: 0px 1px 3px rgba(0,0,0,0.4), 0px 1px 2px rgba(0,0,0,0.3);
+    --elevation-2: 0px 4px 12px rgba(0,0,0,0.5), 0px 2px 4px rgba(0,0,0,0.35);
+    --elevation-3: 0px 10px 32px rgba(0,0,0,0.55), 0px 4px 8px rgba(0,0,0,0.4);
+    --elevation-4: 0px 20px 56px rgba(0,0,0,0.6), 0px 8px 16px rgba(0,0,0,0.45);
+
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 215 28% 5.5%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 28% 5.5%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 28% 5.5%;
+    --primary: 255 92% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 215 28% 5.5%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 16% 46%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 215 28% 5.5%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 255 92% 60%;
+
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-bg-strong: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.3);
+
+    --elevation-0: none;
+    --elevation-1: 0px 1px 3px rgba(0,0,0,0.06), 0px 1px 2px rgba(0,0,0,0.04);
+    --elevation-2: 0px 4px 12px rgba(0,0,0,0.05), 0px 2px 4px rgba(0,0,0,0.03);
+    --elevation-3: 0px 10px 32px rgba(0,0,0,0.08), 0px 4px 8px rgba(0,0,0,0.04);
+    --elevation-4: 0px 20px 56px rgba(0,0,0,0.1), 0px 8px 16px rgba(0,0,0,0.05);
+  }
+
+  .dark {
+    --background: 215 28% 5.5%;
+    --foreground: 210 40% 96%;
+    --card: 217 22% 11.6%;
+    --card-foreground: 210 40% 96%;
+    --popover: 217 22% 11.6%;
+    --popover-foreground: 210 40% 96%;
+    --primary: 255 92% 76%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 26% 9%;
+    --secondary-foreground: 210 40% 96%;
+    --muted: 215 26% 12%;
+    --muted-foreground: 215 16% 55%;
+    --accent: 215 26% 14%;
+    --accent-foreground: 210 40% 96%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 215 22% 21.2%;
+    --input: 215 22% 21.2%;
+    --ring: 255 92% 76%;
+
+    --glass-bg: rgba(10, 13, 18, 0.6);
+    --glass-bg-strong: rgba(10, 13, 18, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.06);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+
+  *:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--violet-200);
+    color: var(--violet-900);
+  }
+
+  .dark ::selection {
+    background: var(--violet-800);
+    color: var(--violet-200);
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+  }
+}
+
+@layer components {
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+  }
+
+  .glass-strong {
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+  }
+
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--elevation-1);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+

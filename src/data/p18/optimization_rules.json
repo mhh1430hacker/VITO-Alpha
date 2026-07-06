@@ -1,0 +1,87 @@
+{
+  "$schema": "p18/v1/optimization_rules",
+  "version": "1.0.0",
+  "rules": [
+    {
+      "id": "OPT-001",
+      "name": "Dead Dashboard Removal",
+      "trigger": "feature_dau_percentage < 10 AND trend <= 0.5",
+      "target": ["Dashboard (Operations)", "Dashboard (Compliance)", "Dashboard (AI)", "Dashboard (R&D)"],
+      "action": "Collapse dashboard into primary tool view (e.g., Compliance dashboard → Compliance Center landing page). Remove standalone dashboard route. Redirect legacy URLs.",
+      "priority": "high",
+      "expected_impact": "Reduce navigation items by 4; simplify information architecture; users land directly on actionable tools"
+    },
+    {
+      "id": "OPT-002",
+      "name": "Sidebar Personalization",
+      "trigger": "per_user_navigation_data_available AND sidebar_section_visit_frequency > 0",
+      "action": "Reorder sidebar sections per user based on 30-day visit frequency. Pin top-3 sections to top. Auto-collapse sections below 2% visit rate. Add 'Suggested' section for next-likely-action based on Markov chain prediction.",
+      "priority": "high",
+      "expected_impact": "Reduce time-to-target page by estimated 35%; improve feature discoverability for underused tools"
+    },
+    {
+      "id": "OPT-003",
+      "name": "AI Dock Confidence Display",
+      "trigger": "ai_response_generated",
+      "action": "Always display confidence tier badge (Very High/High/Moderate/Low/Speculative) with color coding. For confidence < 0.65, auto-expand uncertainty explanation. Show source citations inline as numbered links.",
+      "priority": "high",
+      "expected_impact": "Increase AI response trust rating from 3.2/5 to 4.1/5; increase AI Dock engagement by 25%"
+    },
+    {
+      "id": "OPT-004",
+      "name": "Command Palette Acceleration",
+      "trigger": "cmd_k_opened",
+      "action": "Pre-load top-20 commands per user role. Rank by: (personal_frequency * 0.5) + (role_frequency * 0.3) + (recency * 0.2). Show inline keyboard shortcut hints. Add AI-powered natural language command input ('create rose formula under $50/kg').",
+      "priority": "medium",
+      "expected_impact": "Power user workflow acceleration; 40% reduction in mouse-dependent navigation for keyboard users"
+    },
+    {
+      "id": "OPT-005",
+      "name": "Empty State Intelligence",
+      "trigger": "page_loaded_with_no_data",
+      "action": "Replace generic 'No data yet' with AI-generated starter suggestions: sample formulas, recommended materials, project templates, or guided onboarding wizard based on user role and company segment.",
+      "priority": "medium",
+      "expected_impact": "Reduce 5-minute time-to-value to <60 seconds; increase first-session task completion from 32% to 65%"
+    },
+    {
+      "id": "OPT-006",
+      "name": "Recommendation Proactivity",
+      "trigger": "formula_loaded AND user_role IN (master_perfumer, r_and_d_manager)",
+      "action": "Instead of passive 'See Recommendations' button, surface top recommendation as an inline banner with confidence score. 'We found a 26% cost reduction opportunity for this formula — review suggestion'. One-click apply with undo.",
+      "priority": "high",
+      "expected_impact": "Increase recommendation acceptance from 39% to 55%; reduce cost-optimization discovery time from 8 minutes to 30 seconds"
+    },
+    {
+      "id": "OPT-007",
+      "name": "Notification Streamlining",
+      "trigger": "notification_count > 5_per_hour",
+      "action": "Group low-priority notifications into digest (delivered every 4 hours). Only real-time for: compliance violation, team member action on shared formula, security alert, AI recommendation. Route to email for idle users (>24h offline).",
+      "priority": "medium",
+      "expected_impact": "Reduce notification fatigue; increase notification action rate from 12% to 28%"
+    },
+    {
+      "id": "OPT-008",
+      "name": "Executive View Simplification",
+      "trigger": "user_role = executive",
+      "action": "Replace full sidebar navigation with 4-item command bar: Dashboard, AI Insights, Team, Settings. Show AI Insights Feed as primary content (replacing static KPI widgets). Surface one 'Decision Required' item per visit.",
+      "priority": "high",
+      "expected_impact": "Reduce executive time-to-insight from 6.2 minutes to 90 seconds; increase executive login frequency"
+    },
+    {
+      "id": "OPT-009",
+      "name": "Role-Specific Onboarding",
+      "trigger": "user_first_login",
+      "action": "Detect role → show role-specific onboarding flow: Perfumer sees formula creation; Manager sees project setup; Executive sees metric explanation; Employee sees task list. Skip generic tours.",
+      "priority": "high",
+      "expected_impact": "Increase 7-day activation rate from 41% to 68%; reduce support tickets from new users by 40%"
+    },
+    {
+      "id": "OPT-010",
+      "name": "Search Index Optimization",
+      "trigger": "material_search_p95_latency > 500ms",
+      "action": "Pre-build material search index at build time. Deploy client-side search with WASM-compressed index for sub-50ms response. Fallback to server-side search for queries with >500 results.",
+      "priority": "high",
+      "expected_impact": "Reduce search abandonment from 12% to 4%; improve material catalog satisfaction from 'medium' to 'high'"
+    }
+  ]
+}

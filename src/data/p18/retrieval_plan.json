@@ -1,0 +1,176 @@
+{
+  "$schema": "p18/v1/retrieval_plan",
+  "version": "1.0.0",
+  "pipeline": {
+    "stages": [
+      {
+        "stage": 1,
+        "name": "Query Understanding",
+        "actions": [
+          {
+            "action": "Query Classification",
+            "description": "Classify query into intent categories: substitution_request, compliance_check, cost_analysis, formula_comparison, market_research, regulatory_lookup, general_question",
+            "model": "Fine-tuned DistilBERT classifier (97.2% accuracy on 10K labeled queries)"
+          },
+          {
+            "action": "Entity Extraction",
+            "description": "Extract material names, CAS numbers, formula IDs, regulation names, concentration values, and olfactory descriptors",
+            "model": "spaCy NER + custom fragrance entity gazetteer (4,200 entries)"
+          },
+          {
+            "action": "Query Expansion",
+            "description": "Expand with synonyms (e.g., 'musk' → 'Galaxolide, Ethylene Brassylate, Muscenone, Habanolide') and regulatory aliases (e.g., 'IFRA limit' → 'IFRA QRA Category 4 restriction')",
+            "method": "Domain synonym graph with cosine similarity ≥ 0.7 from embedding space"
+          },
+          {
+            "action": "Constraint Parsing",
+            "description": "Extract numerical constraints (e.g., 'below 20 USD/kg', 'above 0.5%', 'within 3 months') with unit normalization",
+            "method": "Rule-based + GPT-4o-mini for ambiguous constraints"
+          }
+        ]
+      },
+      {
+        "stage": 2,
+        "name": "Multi-Source Retrieval",
+        "actions": [
+          {
+            "action": "Dense Retrieval",
+            "source": "FAISS HNSW index (embedding space)",
+            "query": "Encoded with text-embedding-3-large → 1024-dim vector",
+            "k": 50,
+            "threshold": 0.55
+          },
+          {
+            "action": "Sparse Retrieval",
+            "source": "Elasticsearch BM25 index",
+            "query": "Original + expanded query with weighted fields",
+            "k": 50,
+            "threshold": "BM25 score ≥ 2.0"
+          },
+          {
+            "action": "Hybrid Fusion",
+            "method": "Reciprocal Rank Fusion (RRF) — rank = 1/(k + rank_dense) + 1/(k + rank_sparse), k=60",
+            "output": "Top 20 unified results"
+          },
+          {
+            "action": "Reranking",
+            "model": "Cohere Rerank v3 / BGE-Reranker-v2",
+            "input": "Top 20 fused results",
+            "output": "Top 10 reranked results with relevance scores"
+          }
+        ]
+      },
+      {
+        "stage": 3,
+        "name": "Context Assembly",
+        "actions": [
+          {
+            "action": "Document Chunk Retrieval",
+            "description": "Retrieve full text chunks for top-10 results from source databases"
+          },
+          {
+            "action": "Context Deduplication",
+            "description": "Remove near-duplicate chunks (Jaccard similarity > 0.85 in sentence space)"
+          },
+          {
+            "action": "Context Ordering",
+            "description": "Order by relevance × source_authority. Authority weights: IFRA=1.0, Research Papers=0.85, Internal Formulas=0.80, Supplier Catalogs=0.75, Market Reports=0.65, Customer Notes=0.50"
+          },
+          {
+            "action": "Citation Preparation",
+            "description": "Extract source metadata (document_id, page, paragraph, excerpt) for each chunk"
+          },
+          {
+            "action": "Truncation",
+            "description": "Truncate to fit generation model context window (max 100K tokens for context, leaving 28K for generation)",
+            "strategy": "Priority-based drop: lowest-authority chunks dropped first"
+          }
+        ]
+      },
+      {
+        "stage": 4,
+        "name": "Response Generation",
+        "actions": [
+          {
+            "action": "Prompt Assembly",
+            "template": "system_prompt + conversation_history (last 20 turns) + retrieved_context + user_query"
+          },
+          {
+            "action": "Generation",
+            "model_primary": "Claude 3.5 Sonnet",
+            "model_fallback": "Llama-3-70B (self-hosted, used when OpenAI API unavailable or cost threshold exceeded)",
+            "parameters": { "temperature": 0.3, "max_tokens": 4096, "top_p": 0.9 }
+          },
+          {
+            "action": "Citation Insertion",
+            "method": "Post-generation verification that each factual claim maps to a retrieved chunk; insert inline [N] markers"
+          },
+          {
+            "action": "Confidence Annotation",
+            "method": "Generate confidence score based on: (avg retrieval relevance × 0.4) + (source authority × 0.3) + (answer consistency check × 0.3)"
+          }
+        ]
+      },
+      {
+        "stage": 5,
+        "name": "Post-Generation Validation",
+        "actions": [
+          {
+            "action": "Hallucination Detection",
+            "method": "SelfCheckGPT — compare generated answer against retrieved context; flag claims not supported by any chunk"
+          },
+          {
+            "action": "Regulatory Accuracy Check",
+            "method": "For compliance queries: cross-reference generated IFRA limits/categories against structured IFRA database; flag discrepancies"
+          },
+          {
+            "action": "Factual Consistency Scoring",
+            "method": "NLI (Natural Language Inference) model scores each sentence as entailed/contradicted/neutral vs. retrieved chunks. Overall consistency ≥ 0.85 required for answer delivery; below 0.85 triggers 'I cannot confidently answer this' response"
+          }
+        ]
+      }
+    ]
+  },
+  "retrieval_strategies_per_intent": {
+    "substitution_request": {
+      "primary_source": "Materials Catalog + Supplier Catalogs",
+      "secondary_source": "IFRA Standards (for compliance validation)",
+      "focus": "Molecular similarity, cost comparison, sensory equivalence",
+      "rerank_boost": "Boost materials with confirmed supplier availability"
+    },
+    "compliance_check": {
+      "primary_source": "IFRA Standards + Safety Sheets",
+      "secondary_source": "Regional regulations (REACH, CLP, K-REACH)",
+      "focus": "Exact regulatory text, category-specific limits, QRA calculations",
+      "rerank_boost": "IFRA = 2.0x authority weight"
+    },
+    "cost_analysis": {
+      "primary_source": "Supplier Catalogs + Internal Formula Library",
+      "secondary_source": "Market Intelligence Reports",
+      "focus": "Current pricing, volume discounts, price trends, alternative sourcing"
+    },
+    "formula_comparison": {
+      "primary_source": "Internal Formula Library",
+      "secondary_source": "Market Intelligence (for competitive context)",
+      "focus": "Compositional similarity, olfactory space mapping, cost/performance diff"
+    },
+    "market_research": {
+      "primary_source": "Market Intelligence Reports",
+      "secondary_source": "Internal Formula Library (for portfolio gap analysis)",
+      "focus": "Segment trends, consumer preferences, competitive positioning"
+    },
+    "regulatory_lookup": {
+      "primary_source": "IFRA Standards",
+      "secondary_source": "REACH, CLP, local regulations database",
+      "focus": "Precise regulatory text, effective dates, category definitions"
+    }
+  },
+  "performance_targets": {
+    "retrieval_latency": { "p50": 200, "p95": 500, "p99": 800, "unit": "ms" },
+    "generation_latency": { "p50": 1200, "p95": 3000, "p99": 6000, "unit": "ms" },
+    "end_to_end_latency": { "p50": 1800, "p95": 4000, "p99": 7500, "unit": "ms" },
+    "retrieval_recall_at_10": 0.92,
+    "answer_accuracy": 0.89,
+    "hallucination_rate": 0.03
+  }
+}

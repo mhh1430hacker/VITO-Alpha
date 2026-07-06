@@ -1,0 +1,205 @@
+{
+  "$schema": "p18/v1/knowledge_profile",
+  "version": "1.0.0",
+  "system": {
+    "name": "VITO Knowledge Layer",
+    "architecture": "Retrieval-Augmented Generation (RAG) with Hybrid Search",
+    "model": {
+      "embedding_model": "text-embedding-3-large (OpenAI) / bge-large-en-v1.5 (self-hosted fallback)",
+      "generation_model": "Claude 3.5 Sonnet (primary) / Llama-3-70B (self-hosted fallback)",
+      "reranker": "Cohere Rerank v3 / BGE-Reranker-v2 (self-hosted)",
+      "embedding_dim": 1024,
+      "max_context_length": 128000,
+      "chunk_strategy": "Recursive semantic chunking with 512-token segments and 64-token overlap"
+    },
+    "search": {
+      "hybrid": {
+        "dense_weight": 0.65,
+        "sparse_weight": 0.35,
+        "fusion_method": "Reciprocal Rank Fusion (RRF) with k=60",
+        "minimum_rerank_score": 0.45
+      },
+      "semantic": {
+        "index": "FAISS HNSW (hierarchical navigable small world)",
+        "metric": "cosine_similarity",
+        "top_k_retrieval": 50,
+        "top_k_final": 10
+      },
+      "lexical": {
+        "index": "Elasticsearch BM25",
+        "fields": ["content", "title", "summary", "keywords", "cas_number", "ifra_category"],
+        "boost_factors": { "title": 3.0, "keywords": 2.0, "cas_number": 5.0, "summary": 1.5 }
+      }
+    }
+  },
+  "knowledge_sources": [
+    {
+      "source_type": "regulatory",
+      "name": "IFRA Standards",
+      "description": "International Fragrance Association — 51st Amendment and all historical amendments",
+      "documents": [
+        { "id": "IFRA-51", "title": "IFRA 51st Amendment — Full Standard", "pages": 187, "effective_date": "2024-03-01" },
+        { "id": "IFRA-GL-001", "title": "IFRA Guidance for the Use of IFRA Standards", "pages": 94, "effective_date": "2024-01-15" },
+        { "id": "IFRA-QRA", "title": "IFRA QRA (Quantitative Risk Assessment) Framework v3.1", "pages": 62, "effective_date": "2023-09-01" },
+        { "id": "IFRA-ANNEX-1", "title": "IFRA Annex I — List of Prohibited Substances", "pages": 34, "effective_date": "2024-03-01" },
+        { "id": "IFRA-ANNEX-2", "title": "IFRA Annex II — List of Restricted Substances with QRA Limits", "pages": 112, "effective_date": "2024-03-01" }
+      ],
+      "indexed_chunks": 8420,
+      "last_updated": "2026-06-30T00:00:00Z",
+      "auto_sync": "Weekly check against IFRA.org for amendments"
+    },
+    {
+      "source_type": "safety",
+      "name": "Safety Data Sheets (SDS)",
+      "description": "Safety data sheets for all raw materials in the VITO catalog",
+      "indexed_chunks": 45600,
+      "last_updated": "2026-06-30T08:00:00Z"
+    },
+    {
+      "source_type": "internal",
+      "name": "Internal Formula Library",
+      "description": "All proprietary formulas with metadata, annotations, and performance history",
+      "documents": [
+        { "id": "INT-FRM-*", "count": 145000, "aggregation": "Per-tenant isolation with cross-tenant anonymized analytics" }
+      ],
+      "indexed_chunks": 2900000,
+      "last_updated": "Real-time (event-driven on formula save)",
+      "privacy": "Tenant-isolated knowledge graphs; cross-tenant only for anonymized trend aggregation"
+    },
+    {
+      "source_type": "market",
+      "name": "Market Intelligence Reports",
+      "description": "Fragrance market forecasts, consumer trend reports, competitive landscape analysis",
+      "documents": [
+        { "id": "MKT-MINTEL-2026", "title": "Mintel Global Fragrance Market Report 2026", "pages": 248 },
+        { "id": "MKT-EUROMONITOR-2026", "title": "Euromonitor Premium Beauty & Fragrance 2026", "pages": 312 },
+        { "id": "MKT-NPD-2026-Q2", "title": "NPD Group Prestige Fragrance Q2 2026", "pages": 45 },
+        { "id": "MKT-MCKINSEY-2026", "title": "McKinsey State of Beauty 2026", "pages": 102 }
+      ],
+      "indexed_chunks": 18700,
+      "last_updated": "2026-07-01T12:00:00Z",
+      "auto_sync": "Monthly report updates"
+    },
+    {
+      "source_type": "supplier",
+      "name": "Supplier Catalogs",
+      "description": "Full product catalogs from major fragrance ingredient suppliers",
+      "documents": [
+        { "id": "SUP-GIVAUDAN-2026", "title": "Givaudan Perfumery Ingredients Catalog 2026", "products": 1240 },
+        { "id": "SUP-FIRMENICH-2026", "title": "Firmenich Ingredients & Bases 2026", "products": 980 },
+        { "id": "SUP-IFF-2026", "title": "IFF Ingredients Portfolio 2026", "products": 1520 },
+        { "id": "SUP-SYMRISE-2026", "title": "Symrise Aroma Molecules & Naturals 2026", "products": 870 },
+        { "id": "SUP-MANE-2026", "title": "MANE Naturals & Specialties 2026", "products": 620 },
+        { "id": "SUP-TAKASAGO-2026", "title": "Takasago Aroma Ingredients 2026", "products": 450 }
+      ],
+      "indexed_chunks": 89500,
+      "last_updated": "2026-07-01T00:00:00Z",
+      "auto_sync": "Quarterly catalog refresh"
+    },
+    {
+      "source_type": "research",
+      "name": "Scientific Research Papers",
+      "description": "Peer-reviewed research on fragrance chemistry, olfactory science, and material innovation",
+      "indexed_chunks": 12400,
+      "last_updated": "2026-06-28T00:00:00Z"
+    },
+    {
+      "source_type": "customer_notes",
+      "name": "Customer & Project Notes",
+      "description": "Perfumer annotations, project briefs, client feedback, and historical decision records",
+      "indexed_chunks": 890000,
+      "last_updated": "Real-time (event-driven on note creation)",
+      "privacy": "Strictly per-tenant; never shared across tenants"
+    }
+  ],
+  "capabilities": [
+    {
+      "capability": "semantic_retrieval",
+      "description": "Natural language queries return contextually relevant document chunks based on meaning, not keywords",
+      "example": {
+        "query": "What materials are restricted in fine fragrance at concentrations above 0.1%?",
+        "retrieval_method": "Dense embedding search → Rerank → Top-10 retrieval",
+        "citations_included": true
+      }
+    },
+    {
+      "capability": "hybrid_search",
+      "description": "Combine semantic and lexical search for high-recall retrieval with precise keyword matching (CAS numbers, regulation IDs)",
+      "example": {
+        "query": "CAS 1222-05-5 IFRA limit 51st amendment",
+        "retrieval_method": "RRF fusion of dense (semantic) + BM25 (keyword) results",
+        "citations_included": true
+      }
+    },
+    {
+      "capability": "citation_support",
+      "description": "Every generated answer includes source citations with document ID, page number, and relevant excerpt",
+      "format": {
+        "inline": "[1] Source: IFRA 51st Amendment, p.47, Section 4.2",
+        "footer": "Full reference list with hyperlinks to source documents"
+      }
+    },
+    {
+      "capability": "context_memory",
+      "description": "Maintain conversation context across sessions; user can refer to previous queries and the system remembers domain context",
+      "implementation": "Vector store of conversation embeddings with time-decay weighting (exponential decay, half-life=7 days)",
+      "privacy": "Per-user, encrypted at rest"
+    },
+    {
+      "capability": "conversation_continuity",
+      "description": "Multi-turn conversations that maintain context, allow follow-up refinement, and handle clarification questions",
+      "max_turns": 50,
+      "context_window": "Last 20 messages + retrieved documents"
+    },
+    {
+      "capability": "document_summarization",
+      "description": "Generate executive summaries of long documents (IFRA amendments, market reports, research papers)",
+      "formats": ["executive_summary (3 bullet points)", "detailed_summary (1-2 paragraphs)", "technical_summary (structured with categories)"]
+    },
+    {
+      "capability": "question_answering",
+      "description": "Answer specific questions about fragrance formulation, compliance, materials, and market intelligence with sourced answers"
+    }
+  ],
+  "sample_interactions": [
+    {
+      "question": "Suggest alternatives to Eugenol that maintain the spicy-clove character",
+      "answer": "Based on molecular similarity (GNN embedding) and sensory panel data, the top alternatives to Eugenol (CAS 97-53-0) are:\n\n1. **Isoeugenol (CAS 97-54-1)** — 0.94 molecular similarity. Slightly sweeter, more carnation-like. Cost: $18/kg vs. Eugenol $12/kg. [1] IFRA restriction: 0.02% in Category 4 (fine fragrance) due to sensitization risk.\n\n2. **Dihydroeugenol (CAS 2785-87-7)** — 0.89 similarity. Milder, less pungent. $22/kg. [1] IFRA: 0.5% in Category 4. Better safety profile than isoeugenol.\n\n3. **Methyl Diantilis (Givaudan, CAS 5595-61-3)** — 0.81 similarity in olfactory space. Carnation-spice with vanilla undertone. $45/kg. [2] Supplier: Givaudan. IFRA: unrestricted.\n\n**Recommendation**: For fine fragrance at 0.5% concentration, Dihydroeugenol provides the best safety-to-character ratio. For cost-sensitive applications, retain Eugenol but include 0.05% BHT as antioxidant stabilizer.",
+      "citations": [
+        { "ref": 1, "source": "IFRA 51st Amendment, Annex II, pp.78-82", "excerpt": "Isoeugenol: QRA Category 4 limit 0.02%. Dihydroeugenol: QRA Category 4 limit 0.5%." },
+        { "ref": 2, "source": "Givaudan Perfumery Ingredients Catalog 2026, p.234", "excerpt": "Methyl Diantilis® — spicy carnation specialty with vanilla-musk drydown. IFRA unrestricted." }
+      ]
+    },
+    {
+      "question": "Compare Formula A (FRM-2104, Nocturne Noir) and Formula B (FRM-0891, Bois d'Orient)",
+      "answer": "**Comparative Analysis: Nocturne Noir vs. Bois d'Orient**\n\n| Dimension | Nocturne Noir (FRM-2104) | Bois d'Orient (FRM-0891) |\n|-----------|--------------------------|--------------------------|\n| Olfactory Family | Woody Oriental | Woody Oriental |\n| Overall Similarity | — | 0.874 (GNN cosine) |\n| Cost/kg | $112.70 | $98.40 |\n| Hedonic Score | 78.4 | 81.2 |\n| IFRA Compliance | Full (51st Amd.) | Full (51st Amd.) |\n| Key Differentiator | Rose-centric with sandalwood | Amber-centric with vanilla |\n| Market Position | Luxury EDP, $180/100ml | Luxury EDP, $145/100ml |\n\n**Shared DNA**: Both use Hedione (18.2% vs 16.8%) as the dominant transparent floralizer, Sandalwood Oil, Vanillin, and Patchouli in similar proportions. The core woody-oriental skeleton is nearly identical.\n\n**Divergence**: Nocturne Noir builds on Rose Absolute (8.0%) as the hero ingredient with cost implications ($45/kg). Bois d'Orient achieves its amber character through a Labdanum-Ambermax-Coumarin accord at half the material cost. The rose-to-amber shift is the primary differentiator — Nocturne Noir targets the feminine-leaning market while Bois d'Orient is unisex-positioned.\n\n**Recommendation**: For a flanker line at a lower price point ($120/100ml), adopt Bois d'Orient's amber dry-down while retaining Nocturne Noir's rose top-note signature. Estimated cost: $91/kg (19.3% savings).",
+      "citations": [
+        { "ref": 1, "source": "Internal Formula Library, FRM-2104 & FRM-0891", "excerpt": "Full formula compositions with metadata" },
+        { "ref": 2, "source": "NPD Group Prestige Fragrance Q2 2026, p.28", "excerpt": "Woody Oriental segment growing 12% YoY; rose-centric variants +18%" }
+      ]
+    },
+    {
+      "question": "Find ingredients below 20 USD/kg suitable for a luxury masculine fougère",
+      "answer": "Based on the VITO material catalog limited to fragrance-grade materials below $20.00/kg suitable for fougère compositions:\n\n| Material | CAS | Cost/kg | Supplier | IFRA Cat 4 | Olfactory Role |\n|----------|-----|---------|----------|-----------|----------------|\n| Lavandin Grosso Oil | 8022-15-9 | $14.20 | Biolandes | Unrestricted | Herbaceous top |\n| Bergamot Oil BF | 8007-75-8 | $18.50 | Capua | 0.4% bergapten | Citrus top |\n| Coumarin | 91-64-5 | $8.30 | Symrise | 1.6% | Hay-tonka base |\n| Iso E Super | 54464-57-2 | $12.40 | IFF | Unrestricted | Woody-amber |\n| Hedione | 24851-98-7 | $16.80 | Firmenich | Unrestricted | Jasmine-transparent |\n| Ambroxan | 6790-58-5 | $18.90 | Firmenich | Unrestricted | Ambery-marine |\n| Linalool Synthetic | 78-70-6 | $7.50 | BASF | Unrestricted | Floral-fresh |\n| Geranyl Acetate | 105-87-3 | $11.20 | IFF | Unrestricted | Rose-geranium |\n| Galaxolide 50% | 1222-05-5 | $9.40 | IFF | Unrestricted | Clean musk |\n| Cedarwood Virginia Oil | 8000-27-9 | $12.80 | Albert Vieille | Unrestricted | Woody-pencil |\n\n**52 total materials matched. Full catalog with filtering options available in Materials → Pricing.**",
+      "citations": [
+        { "ref": 1, "source": "Materials Catalog, filtered: cost_per_kg <= 20.00, olfactory_family IN (aromatic, fougère, woody, citrus, herbal)", "excerpt": "52 matching materials" },
+        { "ref": 2, "source": "IFRA 51st Amendment, Annex II", "excerpt": "Category 4 (Fine Fragrance) concentration limits verified for all materials" }
+      ]
+    }
+  ],
+  "context_memory": {
+    "implementation": {
+      "store": "ChromaDB per-user collection",
+      "embedding_model": "text-embedding-3-large",
+      "decay_function": "exponential(time_delta) with half_life_days=7",
+      "max_memories": 1000,
+      "pruning": "LRU with minimum relevance score threshold of 0.3"
+    },
+    "capabilities": [
+      "Recall previous questions about the same formula/project",
+      "Understand when user refers to 'that ingredient from earlier'",
+      "Remember user preferences (preferred suppliers, target markets, cost constraints)",
+      "Persist across browser sessions (encrypted local storage + server-side sync)"
+    ]
+  }
+}

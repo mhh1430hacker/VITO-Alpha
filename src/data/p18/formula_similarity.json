@@ -1,0 +1,200 @@
+{
+  "$schema": "p18/v1/formula_similarity",
+  "version": "1.0.0",
+  "engine": {
+    "primary_method": "Graph Neural Network embedding + cosine similarity",
+    "secondary_method": "ECFP4 Tanimoto similarity on weighted ingredient fingerprints",
+    "embedding_dim": 256,
+    "distance_metric": "cosine",
+    "index_type": "FAISS IVF-PQ (inverted file with product quantization)",
+    "index_size": "145,000 formulas across all tenants (privacy-preserving per-tenant index)"
+  },
+  "similarity_dimensions": [
+    {
+      "dimension": "compositional_similarity",
+      "weight": 0.40,
+      "description": "Ingredient overlap and concentration similarity",
+      "method": "Weighted Jaccard index on ingredient sets with concentration-adjusted scores"
+    },
+    {
+      "dimension": "olfactory_similarity",
+      "weight": 0.30,
+      "description": "Predicted sensory profile similarity based on GC-MS olfactory space projection",
+      "method": "Cosine similarity in 192-dim sensory embedding space (trained on 4,900 materials)"
+    },
+    {
+      "dimension": "structural_similarity",
+      "weight": 0.20,
+      "description": "Molecular structure similarity of ingredient sets",
+      "method": "Mean pairwise ECFP4 Tanimoto similarity between all ingredient pairs"
+    },
+    {
+      "dimension": "commercial_similarity",
+      "weight": 0.10,
+      "description": "Similarity in cost structure, target market, and price positioning",
+      "method": "Euclidean distance in normalized 12-dim commercial feature space"
+    }
+  ],
+  "examples": [
+    {
+      "query_formula": {
+        "id": "FRM-2104",
+        "name": "Nocturne Noir",
+        "type": "Eau de Parfum",
+        "olfactory_family": "Woody Oriental",
+        "key_notes": ["Rose", "Sandalwood", "Vanilla", "Amber", "Patchouli"],
+        "cost_per_kg": 112.70,
+        "target_market": "Luxury Fine Fragrance"
+      },
+      "similar_formulas": [
+        {
+          "rank": 1,
+          "id": "FRM-0891",
+          "name": "Bois d'Orient",
+          "overall_similarity": 0.874,
+          "dimension_breakdown": {
+            "compositional": 0.89,
+            "olfactory": 0.91,
+            "structural": 0.82,
+            "commercial": 0.85
+          },
+          "shared_ingredients": [
+            { "name": "Hedione", "in_query": 18.2, "in_match": 16.8, "unit": "%" },
+            { "name": "Sandalwood Oil", "in_query": 3.2, "in_match": 4.1, "unit": "%" },
+            { "name": "Vanillin", "in_query": 2.8, "in_match": 3.5, "unit": "%" },
+            { "name": "Patchouli Oil", "in_query": 1.9, "in_match": 2.2, "unit": "%" },
+            { "name": "Ambroxan", "in_query": 1.5, "in_match": 1.8, "unit": "%" }
+          ],
+          "divergences": [
+            { "aspect": "Top note", "query": "Bergamot + Pink Pepper", "match": "Mandarin + Cardamom", "olfactory_impact": "citrus shift from bright to warm" },
+            { "aspect": "Rose character", "query": "Rose Absolute (Bulgaria)", "match": "Rose Otto (Turkey) + Rose Givco", "olfactory_impact": "more honeyed, less green" }
+          ],
+          "commercial_data": {
+            "cost_per_kg": 98.40,
+            "market": "Luxury Fine Fragrance",
+            "launch_year": 2024,
+            "market_performance": "Top 50 in Sephora EU 2025"
+          }
+        },
+        {
+          "rank": 2,
+          "id": "FRM-1533",
+          "name": "Velours d'Ambre",
+          "overall_similarity": 0.823,
+          "dimension_breakdown": {
+            "compositional": 0.78,
+            "olfactory": 0.86,
+            "structural": 0.79,
+            "commercial": 0.88
+          },
+          "shared_ingredients": [
+            { "name": "Hedione", "in_query": 18.2, "in_match": 15.4, "unit": "%" },
+            { "name": "Iso E Super", "in_query": 12.1, "in_match": 14.8, "unit": "%" },
+            { "name": "Vanillin", "in_query": 2.8, "in_match": 4.1, "unit": "%" }
+          ],
+          "divergences": [
+            { "aspect": "Wood base", "query": "Sandalwood + Cedar", "match": "Cashmeran + Norlimbanol", "olfactory_impact": "synthetic-modern wood vs natural-classic" },
+            { "aspect": "Amber accord", "query": "Ambroxan + Ambermax", "match": "Amber Xtreme + Labdanum", "olfactory_impact": "mineral-amber vs resinous-amber" }
+          ]
+        },
+        {
+          "rank": 3,
+          "id": "FRM-2118",
+          "name": "Rose Satin",
+          "overall_similarity": 0.767,
+          "dimension_breakdown": {
+            "compositional": 0.72,
+            "olfactory": 0.82,
+            "structural": 0.74,
+            "commercial": 0.81
+          },
+          "shared_ingredients": [
+            { "name": "Hedione", "in_query": 18.2, "in_match": 20.1, "unit": "%" },
+            { "name": "Rose Absolute", "in_query": 8.0, "in_match": 10.5, "unit": "%" },
+            { "name": "Ethylene Brassylate", "in_query": 5.4, "in_match": 6.2, "unit": "%" }
+          ],
+          "divergences": [
+            { "aspect": "Fragrance family", "query": "Woody Oriental", "match": "Floral", "olfactory_impact": "less woody depth; more transparent" },
+            { "aspect": "Concentration", "query": "22% (EDP)", "match": "18% (EDT)", "olfactory_impact": "lower intensity and longevity" }
+          ]
+        }
+      ]
+    },
+    {
+      "query_formula": {
+        "id": "FRM-3102",
+        "name": "Vetiver Céleste",
+        "type": "Eau de Toilette",
+        "olfactory_family": "Aromatic Fougère",
+        "key_notes": ["Vetiver", "Lavender", "Bergamot", "Oakmoss", "Tonka"],
+        "cost_per_kg": 45.30,
+        "target_market": "Masstige / Premium Designer"
+      },
+      "similar_formulas": [
+        {
+          "rank": 1,
+          "id": "FRM-0742",
+          "name": "Fougère Royale (Modern)",
+          "overall_similarity": 0.901,
+          "dimension_breakdown": {
+            "compositional": 0.88,
+            "olfactory": 0.93,
+            "structural": 0.85,
+            "commercial": 0.91
+          },
+          "shared_ingredients": [
+            { "name": "Lavender Oil", "in_query": 8.0, "in_match": 7.2, "unit": "%" },
+            { "name": "Bergamot Oil", "in_query": 6.5, "in_match": 8.0, "unit": "%" },
+            { "name": "Vetiver Oil (Haiti)", "in_query": 4.2, "in_match": 3.8, "unit": "%" },
+            { "name": "Coumarin", "in_query": 3.5, "in_match": 4.0, "unit": "%" },
+            { "name": "Oakmoss Absolute", "in_query": 1.2, "in_match": 0.9, "unit": "%" }
+          ],
+          "divergences": [
+            { "aspect": "Geranium note", "query": "Geranium Bourbon 2.1%", "match": "Geranium Egypt 1.5% + Rose Oxide 0.1%", "olfactory_impact": "more rosy-minty; less green-rosy" },
+            { "aspect": "Base longevity", "query": "Vetiveryl Acetate + Ambroxan", "match": "Vetiverol + Iso E Super", "olfactory_impact": "longer trail but less earthy authenticity" }
+          ],
+          "commercial_data": {
+            "cost_per_kg": 48.90,
+            "market": "Premium Designer",
+            "launch_year": 2023,
+            "market_performance": "Top 20 Men's Fragrance 2024 (Fragrantica)"
+          }
+        },
+        {
+          "rank": 2,
+          "id": "FRM-1127",
+          "name": "Terre Sauvage",
+          "overall_similarity": 0.812,
+          "shared_ingredients": [
+            { "name": "Vetiver Oil", "in_query": 4.2, "in_match": 5.5, "unit": "%" },
+            { "name": "Bergamot Oil", "in_query": 6.5, "in_match": 5.0, "unit": "%" }
+          ],
+          "divergences": [
+            { "aspect": "Fougère structure", "query": "Classic (lavender-oakmoss-coumarin)", "match": "Modern woody (iso e super-ambroxan-cedar)", "olfactory_impact": "contemporary minimalist vs classic complex" }
+          ]
+        }
+      ]
+    }
+  ],
+  "clustering": {
+    "method": "HDBSCAN on 256-dim GNN embeddings",
+    "current_clusters": 24,
+    "silhouette_score": 0.72,
+    "cluster_labels": [
+      { "id": "C01", "label": "Classic Chypre", "formula_count": 1,247, "prototype_formula_id": "FRM-0012" },
+      { "id": "C02", "label": "Modern Amber-Woody", "formula_count": 3,891, "prototype_formula_id": "FRM-0456" },
+      { "id": "C03", "label": "Fresh Citrus-Aquatic", "formula_count": 5,234, "prototype_formula_id": "FRM-0789" },
+      { "id": "C04", "label": "Gourmand Vanilla-Tonka", "formula_count": 2,876, "prototype_formula_id": "FRM-1234" },
+      { "id": "C05", "label": "Floral Aldehydic", "formula_count": 1,903, "prototype_formula_id": "FRM-0567" },
+      { "id": "C06", "label": "Leather-Tobacco", "formula_count": 892, "prototype_formula_id": "FRM-0890" },
+      { "id": "C07", "label": "Green-Aromatic Fougère", "formula_count": 2,145, "prototype_formula_id": "FRM-0742" },
+      { "id": "C08", "label": "Oriental Spicy", "formula_count": 3,102, "prototype_formula_id": "FRM-2104" }
+    ],
+    "outlier_detection": {
+      "enabled": true,
+      "threshold_probability": 0.05,
+      "outlier_count": 67,
+      "outlier_action": "Flag for R&D review; possibly innovative or erroneous formulations"
+    }
+  }
+}

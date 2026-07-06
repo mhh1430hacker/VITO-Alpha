@@ -1,0 +1,178 @@
+{
+  "$schema": "p18/v1/prediction_explanations",
+  "version": "1.0.0",
+  "methodology": {
+    "primary": "SHAP (SHapley Additive exPlanations) — Kernel SHAP for GNN, Tree SHAP for gradient boosted models",
+    "secondary": "LIME (Local Interpretable Model-agnostic Explanations) for individual counterfactual generation",
+    "tertiary": "Integrated Gradients for transformer-based models",
+    "aggregation": "Weighted ensemble SHAP with sign-consistent averaging"
+  },
+  "explanation_templates": {
+    "why_this_recommendation": {
+      "structure": [
+        "confidence_statement",
+        "top_3_factors",
+        "evidence_summary",
+        "limitations_and_caveats"
+      ],
+      "tone": "authoritative but transparent",
+      "must_include": ["confidence_interval", "model_version", "data_drift_score"]
+    },
+    "why_not_this_alternative": {
+      "structure": [
+        "rejection_reason",
+        "comparative_analysis",
+        "what_would_need_to_change"
+      ],
+      "tone": "constructive"
+    },
+    "counterfactual": {
+      "structure": [
+        "minimal_change_scenario",
+        "expected_outcome",
+        "trade_off_summary"
+      ]
+    }
+  },
+  "examples": [
+    {
+      "id": "exp-ingredient-sub-001",
+      "recommendation_id": "rec-a7b3c9e1",
+      "context": "Why recommend Iso E Super as alternative to MAT-4521 (Sandalwood Oil)",
+      "explanation": {
+        "confidence_statement": "91% confidence in this substitution; 95% CI [87%, 94%]. Model: similarity-gnn-v3 (calibrated ECE=0.019).",
+        "top_factors": [
+          {
+            "rank": 1,
+            "feature": "ECFP4 Tanimoto Similarity",
+            "value": 0.893,
+            "shap_contribution": 0.312,
+            "interpretation": "The molecular fingerprint of Iso E Super shares 89.3% structural features with Sandalwood Oil. This is the single strongest predictor of olfactory similarity.",
+            "direction": "supports_recommendation"
+          },
+          {
+            "rank": 2,
+            "feature": "Cost Per KG Delta",
+            "value": "-38.2%",
+            "shap_contribution": 0.187,
+            "interpretation": "Cost reduction of $7.70/kg represents significant savings while maintaining quality. The cost delta is within the acceptable threshold for luxury fine fragrance applications.",
+            "direction": "supports_recommendation"
+          },
+          {
+            "rank": 3,
+            "feature": "Sensory Panel Agreement Score",
+            "value": 0.77,
+            "shap_contribution": 0.143,
+            "interpretation": "Panel of 47 trained evaluators showed d' = 0.23 discrimination between original and substitute, well below the 0.5 threshold for consumer-noticeable difference.",
+            "direction": "supports_recommendation"
+          }
+        ],
+        "evidence_summary": "Iso E Super (CAS 54464-57-2) is an industry-proven synthetic with a 30-year safety record under IFRA. Its woody-amber profile with subtle cedar facets fills the same olfactory space as natural sandalwood. Molecular similarity (0.893) exceeds the 0.80 threshold for substitutability. Sensory panel data confirms non-significant hedonic difference.",
+        "limitations": [
+          "Sensory panel was European demographic only (n=47); may not generalize to Asian markets where sandalwood preferences differ",
+          "Iso E Super has higher substantivity; dry-down character may evolve differently over 8+ hours",
+          "Batch-to-batch variability of Sandalwood Oil (±12% santalol content) means the similarity score has an inherent range of 0.83-0.92"
+        ],
+        "data_drift": {
+          "psi": 0.008,
+          "interpretation": "No meaningful distribution shift detected. Training data remains representative."
+        },
+        "counterfactual": {
+          "minimal_change_scenario": "If budget constraints tighten further, consider mixing Iso E Super with 15% Javanol (MAT-6672) at $31.20/kg for a 42% cost reduction while improving sandalwood fidelity to 0.91 similarity.",
+          "expected_outcome": "42% cost savings with 0.91 similarity; slight increase in creaminess",
+          "trade_off": "Javanol adds a milky-sandalwood facet that may not suit all masculine fragrances"
+        }
+      }
+    },
+    {
+      "id": "exp-cost-reduction-001",
+      "recommendation_id": "rec-b4d2f8a0",
+      "context": "Why Rose Givco 222 is the recommended replacement for Rose Absolute",
+      "explanation": {
+        "confidence_statement": "88% confidence; 95% CI [82%, 92%]. Model: commercial-lgbm-v2 (ECE=0.031).",
+        "top_factors": [
+          {
+            "rank": 1,
+            "feature": "Price Elasticity of Substitution",
+            "value": 0.72,
+            "shap_contribution": 0.245,
+            "interpretation": "Rose Absolute substitutes show strong elasticity — a 58.9% price reduction yields only a 12% sensory deviation. This ratio (4.9:1 cost-to-sensory) exceeds the acceptable 3:1 threshold.",
+            "direction": "supports_recommendation"
+          },
+          {
+            "rank": 2,
+            "feature": "Olfactory Family Alignment",
+            "value": 0.94,
+            "shap_contribution": 0.198,
+            "interpretation": "Rose Givco 222 occupies the same Floral-Rose-Damascenone quadrant in olfactory space as Rose Absolute, with 0.94 cosine similarity in the 192-dim sensory embedding space.",
+            "direction": "supports_recommendation"
+          },
+          {
+            "rank": 3,
+            "feature": "Phenylethyl Alcohol Content Match",
+            "value": 0.81,
+            "shap_contribution": 0.121,
+            "interpretation": "Rose Givco 222 is formulated to match the phenylethyl alcohol (PEA) to citronellol ratio of natural Rose Absolute at 3:2, critical for realistic rose character.",
+            "direction": "supports_recommendation"
+          }
+        ],
+        "evidence_summary": "Rose Givco 222 (Givaudan) was specifically designed as a cost-effective rose base for fine fragrance. It contains 17 aroma chemicals precisely balanced to replicate the PEA/citronellol/geraniol/nerol profile of Bulgarian Rosa damascena absolute. Industry adoption by 3 of the top 5 luxury houses validates its quality.",
+        "limitations": [
+          "Trace compounds (β-damascenone at 0.14%, rose oxide at 0.08%) in natural absolute are absent in the synthetic base, contributing subtle but detectable complexity differences",
+          "Natural absolute offers 'storytelling' marketing value that synthetics cannot replicate for luxury positioning",
+          "Supplier dependency: only Givaudan produces this specific base; supply chain risk exists"
+        ],
+        "counterfactual": {
+          "minimal_change_scenario": "Retain 1.5% Rose Absolute for marketing claim while replacing remaining 6.5% with Rose Givco 222. Cost: $65.20/kg. Savings: 42.2%.",
+          "expected_outcome": "Substantial savings with full 'contains natural rose absolute' label claim intact",
+          "trade_off": "Higher cost than full replacement; requires two inventory SKUs"
+        }
+      }
+    },
+    {
+      "id": "exp-sensory-prediction-001",
+      "context": "Predicted hedonic score of 78.4 for FRM-2104",
+      "explanation": {
+        "confidence_statement": "83% confidence; 95% CI [76, 86]. Model: sensory-transformer-v2 (ECE=0.027).",
+        "top_factors": [
+          {
+            "rank": 1,
+            "feature": "Hedione Concentration",
+            "value": 18.2,
+            "unit": "%",
+            "shap_contribution": 0.184,
+            "interpretation": "Hedione at 18.2% is near the 'sweet spot' (15-20%) for maximizing consumer liking. Above 22% shows diminishing returns in panel data.",
+            "direction": "supports_prediction"
+          },
+          {
+            "rank": 2,
+            "feature": "Rose-Ketone Balance",
+            "value": 0.67,
+            "shap_contribution": 0.152,
+            "interpretation": "The ratio of damascones to ionones (0.67) falls in the optimally-preferred range of 0.55-0.75 based on 2,400 consumer evaluations.",
+            "direction": "supports_prediction"
+          },
+          {
+            "rank": 3,
+            "feature": "Musk Complexity Index",
+            "value": 3,
+            "shap_contribution": -0.098,
+            "interpretation": "Using 3 musks (Galaxolide, Ethylene Brassylate, Muscenone) adds complexity but creates a slight 'muddy' dry-down. Reducing to 2 musks could improve clarity by 3-5 hedonic points.",
+            "direction": "opposes_prediction"
+          }
+        ],
+        "evidence_summary": "The transformer model identifies Hedione as the dominant driver of consumer liking for this formula type (floral-woody). The rose accord construction is technically sound. The musk blend complexity is slightly above optimal; simplifying could push hedonic score above 80.",
+        "limitations": [
+          "Consumer panel data heavily weighted toward European and North American preferences; Asian markets (35% of luxury fragrance spend) may differ",
+          "Seasonal effects not modeled: this formula was evaluated in spring panels; summer preferences for lighter profiles not captured",
+          "Brand halo effects (bottle, marketing, celebrity endorsement) contribute 30-40% of real-world liking and are not modeled"
+        ],
+        "counterfactual": {
+          "minimal_change_scenario": "Remove Muscenone (0.4%), increase Galaxolide from 8.2% to 8.6%",
+          "expected_outcome": "Hedonic score rises to 82.8; cleaner dry-down at cost saving of $1.20/kg",
+          "trade_off": "Slight reduction in musk complexity; panelists who prefer 'animalic' facets may notice absence"
+        }
+      }
+    }
+  ]
+}

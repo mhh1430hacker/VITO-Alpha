@@ -1,0 +1,208 @@
+{
+  "$schema": "p18/v1/confidence_scores",
+  "version": "1.0.0",
+  "engine_calibration": {
+    "overall_expected_calibration_error": 0.027,
+    "per_model_calibration": [
+      {
+        "model_id": "similarity-gnn-v3",
+        "ece": 0.019,
+        "reliability_diagram_bins": [
+          { "confidence_bucket": "0.0-0.1", "accuracy": 0.12, "count": 3 },
+          { "confidence_bucket": "0.1-0.2", "accuracy": 0.18, "count": 7 },
+          { "confidence_bucket": "0.2-0.3", "accuracy": 0.25, "count": 14 },
+          { "confidence_bucket": "0.3-0.4", "accuracy": 0.38, "count": 31 },
+          { "confidence_bucket": "0.4-0.5", "accuracy": 0.48, "count": 89 },
+          { "confidence_bucket": "0.5-0.6", "accuracy": 0.57, "count": 204 },
+          { "confidence_bucket": "0.6-0.7", "accuracy": 0.66, "count": 412 },
+          { "confidence_bucket": "0.7-0.8", "accuracy": 0.74, "count": 891 },
+          { "confidence_bucket": "0.8-0.9", "accuracy": 0.84, "count": 1562 },
+          { "confidence_bucket": "0.9-1.0", "accuracy": 0.92, "count": 2147 }
+        ],
+        "well_calibrated": true,
+        "requires_recalibration": false
+      },
+      {
+        "model_id": "commercial-lgbm-v2",
+        "ece": 0.031,
+        "reliability_diagram_bins": [
+          { "confidence_bucket": "0.0-0.1", "accuracy": 0.08, "count": 2 },
+          { "confidence_bucket": "0.1-0.2", "accuracy": 0.15, "count": 6 },
+          { "confidence_bucket": "0.2-0.3", "accuracy": 0.22, "count": 12 },
+          { "confidence_bucket": "0.3-0.4", "accuracy": 0.35, "count": 28 },
+          { "confidence_bucket": "0.4-0.5", "accuracy": 0.46, "count": 67 },
+          { "confidence_bucket": "0.5-0.6", "accuracy": 0.55, "count": 178 },
+          { "confidence_bucket": "0.6-0.7", "accuracy": 0.63, "count": 345 },
+          { "confidence_bucket": "0.7-0.8", "accuracy": 0.73, "count": 678 },
+          { "confidence_bucket": "0.8-0.9", "accuracy": 0.82, "count": 1234 },
+          { "confidence_bucket": "0.9-1.0", "accuracy": 0.89, "count": 1876 }
+        ],
+        "well_calibrated": true,
+        "requires_recalibration": false
+      },
+      {
+        "model_id": "stability-xgb-v1",
+        "ece": 0.015,
+        "well_calibrated": true,
+        "requires_recalibration": false
+      },
+      {
+        "model_id": "sensory-transformer-v2",
+        "ece": 0.027,
+        "well_calibrated": true,
+        "requires_recalibration": false
+      },
+      {
+        "model_id": "accord-gan-v1",
+        "ece": 0.041,
+        "well_calibrated": false,
+        "requires_recalibration": true,
+        "note": "Temperature scaling scheduled for next training cycle"
+      },
+      {
+        "model_id": "trend-nlp-v1",
+        "ece": 0.045,
+        "well_calibrated": false,
+        "requires_recalibration": true,
+        "note": "High variance in financial market correlation; isotonic recalibration planned"
+      }
+    ]
+  },
+  "uncertainty_quantification": {
+    "methods": {
+      "epistemic": "Monte Carlo Dropout (n=50 forward passes), variance across ensemble members",
+      "aleatoric": "Learned variance head on GNN output layer, heteroscedastic Gaussian loss",
+      "distributional_shift": "Population Stability Index (PSI) between training and inference distributions"
+    },
+    "reporting": {
+      "interval_type": "95% confidence interval",
+      "computation": "Bootstrap resampling (n=1000) with bias-corrected accelerated (BCa) method",
+      "display": {
+        "primary": "Point estimate with CI shown as [lower, upper]",
+        "tooltip": "Full uncertainty decomposition (epistemic vs. aleatoric)",
+        "chart": "Prediction interval ribbon on all trend/time-series visualizations"
+      }
+    }
+  },
+  "confidence_per_recommendation_type": {
+    "ingredient_substitution": {
+      "mean_confidence": 0.863,
+      "std_confidence": 0.074,
+      "rejection_rate_at_0.7_threshold": 0.12,
+      "user_acceptance_rate": 0.71,
+      "false_positive_rate": 0.09
+    },
+    "cost_reduction": {
+      "mean_confidence": 0.812,
+      "std_confidence": 0.091,
+      "rejection_rate_at_0.7_threshold": 0.18,
+      "user_acceptance_rate": 0.64,
+      "false_positive_rate": 0.14
+    },
+    "compliance_optimization": {
+      "mean_confidence": 0.941,
+      "std_confidence": 0.032,
+      "rejection_rate_at_0.85_threshold": 0.03,
+      "user_acceptance_rate": 0.92,
+      "false_positive_rate": 0.01
+    },
+    "stability_improvement": {
+      "mean_confidence": 0.794,
+      "std_confidence": 0.089,
+      "rejection_rate_at_0.72_threshold": 0.22,
+      "user_acceptance_rate": 0.59,
+      "false_positive_rate": 0.17
+    },
+    "market_positioning": {
+      "mean_confidence": 0.756,
+      "std_confidence": 0.112,
+      "rejection_rate_at_0.68_threshold": 0.28,
+      "user_acceptance_rate": 0.52,
+      "false_positive_rate": 0.21
+    },
+    "formula_similarity": {
+      "mean_confidence": 0.887,
+      "std_confidence": 0.058,
+      "rejection_rate_at_0.65_threshold": 0.07,
+      "user_acceptance_rate": 0.78,
+      "false_positive_rate": 0.06
+    },
+    "accord_generation": {
+      "mean_confidence": 0.723,
+      "std_confidence": 0.128,
+      "rejection_rate_at_0.70_threshold": 0.34,
+      "user_acceptance_rate": 0.47,
+      "false_positive_rate": 0.26
+    },
+    "sensory_prediction": {
+      "mean_confidence": 0.834,
+      "std_confidence": 0.067,
+      "rejection_rate_at_0.75_threshold": 0.16,
+      "user_acceptance_rate": 0.68,
+      "false_positive_rate": 0.11
+    },
+    "trend_analysis": {
+      "mean_confidence": 0.681,
+      "std_confidence": 0.145,
+      "rejection_rate_at_0.60_threshold": 0.31,
+      "user_acceptance_rate": 0.43,
+      "false_positive_rate": 0.24
+    }
+  },
+  "real_time_examples": [
+    {
+      "id": "conf-rec-a7b3c9",
+      "recommendation_type": "ingredient_substitution",
+      "context": "MAT-4521 replacement for cost reduction",
+      "point_estimate": 0.91,
+      "ci_95": [0.87, 0.94],
+      "uncertainty_decomposition": {
+        "epistemic": 0.018,
+        "aleatoric": 0.028,
+        "distributional_shift": 0.006
+      },
+      "factors_influencing_confidence": [
+        { "factor": "Molecular similarity score", "impact": "positive_strong", "value": 0.893 },
+        { "factor": "Sensory panel agreement", "impact": "positive_moderate", "value": "d' = 0.23 (n=47)" },
+        { "factor": "Supplier reliability score", "impact": "positive_weak", "value": 0.82 },
+        { "factor": "Training set representation", "impact": "positive_strong", "value": "MAT-4521 has 1,247 neighbors in training set" }
+      ]
+    },
+    {
+      "id": "conf-rec-b4d2f8",
+      "recommendation_type": "cost_reduction",
+      "context": "FRM-2104 cost optimization from $112.70 to $83.40/kg",
+      "point_estimate": 0.87,
+      "ci_95": [0.81, 0.91],
+      "uncertainty_decomposition": {
+        "epistemic": 0.024,
+        "aleatoric": 0.035,
+        "distributional_shift": 0.011
+      },
+      "factors_influencing_confidence": [
+        { "factor": "Historical cost prediction accuracy", "impact": "positive_strong", "value": "MAPE 4.2% on last 500 predictions" },
+        { "factor": "Supplier price volatility", "impact": "negative_moderate", "value": "Rose Absolute spot price variance 12.4% MoM" },
+        { "factor": "Synthetic base availability", "impact": "positive_strong", "value": "Givaudan confirmed stock levels" },
+        { "factor": "Formula complexity", "impact": "negative_weak", "value": "23-ingredient formula; interactions increase variance" }
+      ]
+    },
+    {
+      "id": "conf-rec-c9e2a1",
+      "recommendation_type": "accord_generation",
+      "context": "\"Fresh oceanic with green tea undertones\" accord generation",
+      "point_estimate": 0.68,
+      "ci_95": [0.55, 0.78],
+      "uncertainty_decomposition": {
+        "epistemic": 0.051,
+        "aleatoric": 0.037,
+        "distributional_shift": 0.019
+      },
+      "factors_influencing_confidence": [
+        { "factor": "Prompt specificity", "impact": "positive_moderate", "value": "Multi-faceted description with hedonic anchors" },
+        { "factor": "Training data coverage for 'green tea'", "impact": "negative_strong", "value": "Only 217 examples; underrepresented accord" },
+        { "factor": "Sensory panel validation pipeline", "impact": "positive_weak", "value": "In silico only; no physical panel scheduled" },
+        { "factor": "GAN mode collapse risk", "impact": "negative_moderate", "value": "Diversity score 0.61 on last 1000 generations" }
+      ]
+    }
+  ]
+}

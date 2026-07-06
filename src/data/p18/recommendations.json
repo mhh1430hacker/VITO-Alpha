@@ -1,0 +1,373 @@
+{
+  "$schema": "p18/v1/recommendations",
+  "version": "1.0.0",
+  "engine": {
+    "name": "VITO Olfactory Intelligence Engine",
+    "version": "4.2.1",
+    "models": [
+      {
+        "id": "similarity-gnn-v3",
+        "type": "Graph Neural Network",
+        "task": "Molecular Similarity Matching",
+        "architecture": "Message-Passing GNN with Attention",
+        "input": "RDKit Morgan Fingerprint (ECFP4, 2048-bit)",
+        "training_set": "127,000 fragrance molecules across 14 suppliers",
+        "accuracy": 0.918,
+        "latency_ms": { "p50": 42, "p95": 87, "p99": 156 },
+        "last_trained": "2026-06-28T09:00:00Z",
+        "drift_score": 0.023,
+        "status": "active"
+      },
+      {
+        "id": "commercial-lgbm-v2",
+        "type": "LightGBM Ensemble",
+        "task": "Commercial Viability Prediction",
+        "architecture": "Gradient-boosted decision trees with monotonic constraints",
+        "input": "Formula composition, market segment, target region, supply chain features (42 features total)",
+        "training_set": "8,400 commercial fragrance formulas with validated market outcomes",
+        "accuracy": 0.876,
+        "calibration_error": 0.031,
+        "latency_ms": { "p50": 18, "p95": 35, "p99": 52 },
+        "last_trained": "2026-06-25T14:00:00Z",
+        "drift_score": 0.018,
+        "status": "active"
+      },
+      {
+        "id": "stability-xgb-v1",
+        "type": "XGBoost Classifier",
+        "task": "Formula Stability Prediction",
+        "architecture": "Multi-output tree ensemble with interaction constraints",
+        "input": "Ingredient interactions, pH, solubility, light sensitivity, oxidation potential (28 features)",
+        "training_set": "15,200 accelerated aging test results across 3,100 formulas",
+        "accuracy": 0.843,
+        "latency_ms": { "p50": 12, "p95": 24, "p99": 38 },
+        "last_trained": "2026-06-20T11:00:00Z",
+        "drift_score": 0.009,
+        "status": "active"
+      },
+      {
+        "id": "sensory-transformer-v2",
+        "type": "Transformer Encoder",
+        "task": "Sensory Profile Prediction",
+        "architecture": "6-layer transformer encoder with learned positional encoding, supervised by GC-MS olfactory data",
+        "input": "SMILES sequences + molecular descriptors (192-dim embedding)",
+        "training_set": "4,900 fragrance ingredients with human sensory panel evaluations",
+        "accuracy": 0.891,
+        "calibration_error": 0.027,
+        "latency_ms": { "p50": 95, "p95": 178, "p99": 245 },
+        "last_trained": "2026-06-30T08:00:00Z",
+        "drift_score": 0.014,
+        "status": "active"
+      },
+      {
+        "id": "accord-gan-v1",
+        "type": "Conditional GAN with Reinforcement Learning",
+        "task": "Accord Generation",
+        "architecture": "Generator-discriminator with policy gradient reward on sensory, cost, and compliance scores",
+        "input": "Target accord description (text) + constraints (cost ceiling, IFRA limits, sustainability preferences)",
+        "training_set": "22,000 professional accords from IFF, Givaudan, Firmenich, Symrise — public formulations only",
+        "accuracy": 0.862,
+        "latency_ms": { "p50": 320, "p95": 610, "p99": 890 },
+        "last_trained": "2026-06-22T16:00:00Z",
+        "drift_score": 0.031,
+        "status": "active"
+      },
+      {
+        "id": "trend-nlp-v1",
+        "type": "Fine-tuned LLM with Temporal Attention",
+        "task": "Market Trend Analysis",
+        "architecture": "Mistral-7B fine-tuned on fragrance market reports, social media fragrance discourse, and IFRA regulatory timelines",
+        "input": "Market segment, region, time horizon, consumer demographic (natural language)",
+        "training_set": "~2.1M documents (market reports 2018-2026, perfume blogs, regulatory updates)",
+        "accuracy": 0.834,
+        "latency_ms": { "p50": 580, "p95": 1200, "p99": 2100 },
+        "last_trained": "2026-06-27T10:00:00Z",
+        "drift_score": 0.045,
+        "status": "active"
+      }
+    ],
+    "fusion": {
+      "strategy": "Weighted Ensemble with Confidence Calibration",
+      "explainability": "SHAP values on ensemble predictions, LIME for individual model decisions",
+      "ab_inference": {
+        "enabled": true,
+        "split_ratio": "90/10",
+        "challenger_model": "similarity-gnn-v3-experimental",
+        "evaluation_metric": "recommendation_acceptance_rate"
+      }
+    }
+  },
+  "recommendation_types": [
+    {
+      "type": "ingredient_substitution",
+      "icon": "ArrowRightLeft",
+      "label": "Ingredient Substitution",
+      "description": "Find chemically and sensorially equivalent alternatives with better cost, compliance, or availability profiles",
+      "triggers": ["material_selected", "cost_anomaly_detected", "ifra_violation", "supplier_disruption"],
+      "model": "similarity-gnn-v3",
+      "confidence_threshold": 0.75,
+      "input_required": ["material_id"],
+      "output": {
+        "alternatives": "Ranked list of substitute candidates",
+        "similarity_matrix": "Pairwise molecular similarity scores",
+        "cost_delta": "Expected cost impact per kg",
+        "sensory_delta": "Predicted sensory profile change",
+        "compliance_impact": "Regulatory status comparison"
+      },
+      "example": {
+        "request": { "material_id": "MAT-4521", "objective": "cost_reduction", "budget_usd_per_kg": 15 },
+        "response": {
+          "recommendation_id": "rec-a7b3c9e1",
+          "alternatives": [
+            {
+              "material_id": "MAT-7812",
+              "name": "Iso E Super (Synthetic)",
+              "similarity_score": 0.893,
+              "cost_per_kg": 12.40,
+              "cost_savings_percentage": 38.2,
+              "sensory_impact": "minimal",
+              "sensory_notes": "Slightly less woody depth; compensate with 0.5% Cedrol",
+              "ifra_status": "unrestricted",
+              "supplier_lead_time_days": 14,
+              "confidence": 0.91
+            },
+            {
+              "material_id": "MAT-3390",
+              "name": "Ambroxan (Synthetic)",
+              "similarity_score": 0.847,
+              "cost_per_kg": 18.90,
+              "cost_savings_percentage": 5.6,
+              "sensory_impact": "low",
+              "sensory_notes": "Slightly more marine character; aligns with current fresh-aquatic trend",
+              "ifra_status": "restricted_at_15_percent",
+              "supplier_lead_time_days": 7,
+              "confidence": 0.85
+            },
+            {
+              "material_id": "MAT-9001",
+              "name": "Cedramber (Synthetic Blend)",
+              "similarity_score": 0.812,
+              "cost_per_kg": 9.80,
+              "cost_savings_percentage": 51.2,
+              "sensory_impact": "moderate",
+              "sensory_notes": "Drier amber wood profile; may shift accord character slightly",
+              "ifra_status": "unrestricted",
+              "supplier_lead_time_days": 21,
+              "confidence": 0.79
+            }
+          ],
+          "reasoning": "MAT-4521 (Natural Sandalwood Oil, $20.10/kg) shows 82.3% molecular similarity to Iso E Super at 38.2% cost reduction. Sensory panel data (n=47) confirms minimal hedonic difference (d' = 0.23). IFRA 51st Amendment compliance verified. Recommend MAT-7812 as primary alternative with Cedrol micro-adjustment for depth preservation.",
+          "confidence": 0.91,
+          "references": ["IFRA-51-ANNEX-1", "SENSORY-PANEL-2026-Q2", "SUPPLIER-CATALOG-GIVAUDAN-2026"]
+        }
+      }
+    },
+    {
+      "type": "cost_reduction",
+      "icon": "DollarSign",
+      "label": "Cost Reduction",
+      "description": "Optimize formula cost while preserving sensory profile and compliance",
+      "triggers": ["formula_loaded", "cost_exceeds_budget", "manual_request"],
+      "model": "commercial-lgbm-v2",
+      "confidence_threshold": 0.70,
+      "input_required": ["formula_id"],
+      "output": {
+        "savings_estimate": "Projected cost reduction range",
+        "trade_offs": "Quality/compliance/stability impact per scenario",
+        "implementation_steps": "Ordered list of changes"
+      },
+      "example": {
+        "request": { "formula_id": "FRM-2104", "target_cost_per_kg": 85, "preserve_sensory": true },
+        "response": {
+          "recommendation_id": "rec-b4d2f8a0",
+          "current_cost_per_kg": 112.70,
+          "optimized_cost_per_kg": 83.40,
+          "savings_percentage": 26.0,
+          "suggestions": [
+            {
+              "action": "replace",
+              "from": { "material_id": "MAT-2047", "name": "Rose Absolute (Bulgaria)", "cost": 45.00, "percentage": 8.0 },
+              "to": { "material_id": "MAT-6681", "name": "Rose Givco 222 (Givaudan Base)", "cost": 18.50, "percentage": 7.2 },
+              "sensory_impact_score": 0.12,
+              "confidence": 0.88
+            },
+            {
+              "action": "reduce",
+              "from": { "material_id": "MAT-1190", "name": "Orris Butter (15% Irones)", "cost": 380.00, "percentage": 0.5 },
+              "new_percentage": 0.3,
+              "sensory_impact_score": 0.08,
+              "confidence": 0.93
+            },
+            {
+              "action": "replace",
+              "from": { "material_id": "MAT-3321", "name": "Jasmine Absolute (India)", "cost": 28.00, "percentage": 4.0 },
+              "to": { "material_id": "MAT-7723", "name": "Jasmophore (Firmenich Base)", "cost": 9.80, "percentage": 3.8 },
+              "sensory_impact_score": 0.18,
+              "confidence": 0.82
+            }
+          ],
+          "expected_sensory_drift": "Minor (d' < 0.3 across all hedonic dimensions)",
+          "compliance_status": "Fully IFRA 51 compliant post-changes",
+          "stability_impact": "Negligible; accelerated aging simulation shows 98.7% profile retention at 12 months",
+          "reasoning": "Identified 3 high-cost naturals with structurally similar synthetic bases. Rose Givco 222 shows 0.94 cosine similarity in embedding space. Jasmine Absolute replacement preserves indolic character within consumer detection threshold. Orris Butter reduction compensated by increased Ionone Alpha (MAT-4410) at 0.15%.",
+          "confidence": 0.87,
+          "references": ["GIVAUDAN-TECHNICAL-DATA-2026", "FIRMENICH-CATALOG-2026", "STABILITY-SIM-2026-Q2"]
+        }
+      }
+    },
+    {
+      "type": "compliance_optimization",
+      "icon": "ShieldCheck",
+      "label": "Compliance Optimization",
+      "description": "Ensure formula meets IFRA, REACH, CLP, and regional regulatory requirements",
+      "triggers": ["formula_loaded", "regulation_update", "manual_request"],
+      "model": "similarity-gnn-v3",
+      "confidence_threshold": 0.85,
+      "input_required": ["formula_id", "target_regulation"],
+      "output": {
+        "violations": "Current compliance gaps",
+        "remediation": "Suggested changes to achieve compliance",
+        "regulatory_text": "Exact IFRA/REACH clause references"
+      }
+    },
+    {
+      "type": "stability_improvement",
+      "icon": "Activity",
+      "label": "Stability Improvement",
+      "description": "Predict and prevent degradation, discoloration, and olfactory drift over shelf life",
+      "triggers": ["formula_loaded", "stability_test_failed", "manual_request"],
+      "model": "stability-xgb-v1",
+      "confidence_threshold": 0.72,
+      "input_required": ["formula_id"],
+      "output": {
+        "risk_factors": "Ingredients/mixtures prone to instability",
+        "mitigations": "Stabilizer recommendations and concentration adjustments",
+        "predicted_shelf_life": "Months under standard and accelerated conditions"
+      }
+    },
+    {
+      "type": "market_positioning",
+      "icon": "TrendingUp",
+      "label": "Market Positioning",
+      "description": "Analyze competitive landscape and suggest optimal positioning strategy",
+      "triggers": ["formula_loaded", "market_segment_selected", "manual_request"],
+      "model": "commercial-lgbm-v2",
+      "confidence_threshold": 0.68,
+      "input_required": ["formula_id", "target_market", "target_price_point"],
+      "output": {
+        "competitive_analysis": "Positioning map vs. market alternatives",
+        "price_optimization": "Revenue-maximizing price point",
+        "segment_recommendation": "Best-fit market segment"
+      }
+    },
+    {
+      "type": "formula_similarity",
+      "icon": "GitBranch",
+      "label": "Formula Similarity",
+      "description": "Find structurally and sensorially similar formulas in your library for inspiration or gap analysis",
+      "triggers": ["formula_loaded", "brief_entered", "manual_request"],
+      "model": "similarity-gnn-v3",
+      "confidence_threshold": 0.65,
+      "input_required": ["formula_id"],
+      "output": {
+        "similar_formulas": "Ranked list with similarity scores",
+        "shared_ingredients": "Common materials across formulas",
+        "divergence_areas": "Where formulas differ and why"
+      }
+    },
+    {
+      "type": "formula_clustering",
+      "icon": "Layers",
+      "label": "Formula Clustering",
+      "description": "Discover natural groupings in your formula portfolio by olfactory profile, cost structure, or market performance",
+      "triggers": ["library_loaded", "portfolio_review", "manual_request"],
+      "model": "similarity-gnn-v3",
+      "confidence_threshold": 0.60,
+      "input_required": ["project_id"],
+      "output": {
+        "clusters": "K-means/HDBSCAN clusters with labels",
+        "silhouette_score": "Cluster quality metric",
+        "outlier_formulas": "Formulas that don't fit any cluster"
+      }
+    },
+    {
+      "type": "accord_generation",
+      "icon": "Sparkles",
+      "label": "Accord Generation",
+      "description": "Generate novel fragrance accords from text descriptions using conditional GAN with sensory validation",
+      "triggers": ["accord_brief_entered", "manual_request"],
+      "model": "accord-gan-v1",
+      "confidence_threshold": 0.70,
+      "input_required": ["accord_description", "constraints"],
+      "output": {
+        "generated_accords": "List of ingredient compositions with percentages",
+        "predicted_sensory_profile": "Top/mid/base notes, intensity, longevity",
+        "novelty_score": "How unique vs. training set"
+      }
+    },
+    {
+      "type": "sensory_prediction",
+      "icon": "Eye",
+      "label": "Sensory Prediction",
+      "description": "Predict hedonic scores, intensity ratings, and consumer preference before physical compounding",
+      "triggers": ["formula_loaded", "manual_request"],
+      "model": "sensory-transformer-v2",
+      "confidence_threshold": 0.75,
+      "input_required": ["formula_id"],
+      "output": {
+        "hedonic_score": "Predicted consumer liking (1-100)",
+        "intensity_profile": "Top/mid/base intensity decay curves",
+        "demographic_breakdown": "Predicted preferences by age/gender/region"
+      }
+    },
+    {
+      "type": "trend_analysis",
+      "icon": "BarChart3",
+      "label": "Trend Analysis",
+      "description": "Identify emerging olfactory trends from market data, social media, and regulatory shifts",
+      "triggers": ["market_segment_selected", "scheduled_weekly", "manual_request"],
+      "model": "trend-nlp-v1",
+      "confidence_threshold": 0.60,
+      "input_required": ["market_segment", "time_horizon_months"],
+      "output": {
+        "emerging_trends": "Directional shifts with evidence citations",
+        "declining_notes": "Falling consumer interest patterns",
+        "regulatory_forecast": "Expected IFRA amendment changes"
+      }
+    }
+  ],
+  "confidence_framework": {
+    "scale": { "min": 0.0, "max": 1.0, "description": "Calibrated probability that the recommendation, if implemented, achieves the stated outcome" },
+    "tiers": [
+      { "range": [0.90, 1.00], "label": "Very High Confidence", "color": "emerald", "action": "Safe to implement; extensive evidence supports recommendation" },
+      { "range": [0.80, 0.90], "label": "High Confidence", "color": "green", "action": "Recommended; validate with one small-batch trial" },
+      { "range": [0.65, 0.80], "label": "Moderate Confidence", "color": "amber", "action": "Proceed with caution; requires 2-3 validation batches" },
+      { "range": [0.50, 0.65], "label": "Low Confidence", "color": "orange", "action": "Exploratory; treat as hypothesis for R&D investigation" },
+      { "range": [0.00, 0.50], "label": "Speculative", "color": "red", "action": "Insufficient data; recommendation suppressed unless explicitly requested" }
+    ],
+    "calibration": {
+      "method": "Isotonic Regression with Platt Scaling Fallback",
+      "last_calibrated": "2026-06-30T12:00:00Z",
+      "ece": 0.027,
+      "mce": 0.048
+    },
+    "drift_monitoring": {
+      "enabled": true,
+      "check_interval_hours": 6,
+      "alert_threshold_psi": 0.15,
+      "auto_retrain": true,
+      "retrain_data_window_days": 90
+    }
+  },
+  "explainability": {
+    "methods": ["SHAP", "LIME", "Integrated Gradients (for transformer models)", "Counterfactual Explanations"],
+    "per_recommendation": {
+      "required_fields": ["reasoning", "confidence", "references"],
+      "optional_fields": ["feature_importance", "counterfactual", "uncertainty_interval"]
+    },
+    "uncertainty": {
+      "types": ["aleatoric (data noise)", "epistemic (model uncertainty)", "distributional_shift"],
+      "reporting": "All predictions include 95% confidence intervals computed via bootstrapping (n=1000)"
+    }
+  }
+}

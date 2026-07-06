@@ -1,0 +1,372 @@
+{
+  "$schema": "p18/v1/executive_metrics",
+  "version": "1.0.0",
+  "dashboard": {
+    "name": "VITO Executive Command Center",
+    "refresh_interval_seconds": 30,
+    "data_latency": "Real-time for operational metrics; max 15-minute lag for financial aggregates"
+  },
+  "metrics": {
+    "financial": [
+      {
+        "id": "arr",
+        "label": "Annual Recurring Revenue",
+        "description": "Total annualized subscription revenue across all active tenants",
+        "current": 8470000,
+        "unit": "USD",
+        "trend": "+23.4%",
+        "trend_period": "YoY",
+        "target": 12000000,
+        "breakdown": {
+          "starter_999": { "customers": 8, "revenue": 95904 },
+          "professional_4999": { "customers": 34, "revenue": 2039592 },
+          "business_24990": { "customers": 18, "revenue": 5397840 },
+          "enterprise_99990": { "customers": 1, "revenue": 1199880 }
+        },
+        "forecast_eoy": 11200000,
+        "forecast_confidence": 0.82,
+        "forecast_method": "Bayesian structural time series with 3-month seasonal decomposition"
+      },
+      {
+        "id": "mrr",
+        "label": "Monthly Recurring Revenue",
+        "description": "Total monthly subscription revenue across all active tenants",
+        "current": 705833,
+        "unit": "USD",
+        "trend": "+8.2%",
+        "trend_period": "MoM",
+        "target": 1000000,
+        "expansion_mrr": 42500,
+        "new_mrr": 38400,
+        "churned_mrr": 12100,
+        "net_new_mrr": 68800
+      },
+      {
+        "id": "ltv",
+        "label": "Customer Lifetime Value",
+        "description": "Average revenue per customer over expected lifetime",
+        "current": 189000,
+        "unit": "USD",
+        "trend": "+12.1%",
+        "trend_period": "YoY",
+        "by_tier": {
+          "starter": 24000,
+          "professional": 98000,
+          "business": 420000,
+          "enterprise": 2100000
+        }
+      },
+      {
+        "id": "cac",
+        "label": "Customer Acquisition Cost",
+        "description": "Average cost to acquire a new paying customer",
+        "current": 14200,
+        "unit": "USD",
+        "trend": "-8.4%",
+        "trend_period": "QoQ",
+        "payback_months": 4.1,
+        "ltv_cac_ratio": 13.3,
+        "channels": {
+          "direct_sales": { "cac": 18400, "conversion_rate": 0.22 },
+          "inbound_marketing": { "cac": 8900, "conversion_rate": 0.08 },
+          "partner_referral": { "cac": 6200, "conversion_rate": 0.14 },
+          "conference": { "cac": 24500, "conversion_rate": 0.18 }
+        }
+      },
+      {
+        "id": "gross_margin",
+        "label": "Gross Margin",
+        "description": "Revenue minus cost of goods sold (infrastructure + inference compute)",
+        "current": 78.4,
+        "unit": "%",
+        "trend": "+3.2pp",
+        "trend_period": "QoQ",
+        "target": 85,
+        "cost_breakdown": {
+          "cloud_infrastructure": 12.3,
+          "gpu_compute": 5.8,
+          "third_party_apis": 2.1,
+          "support_staff": 1.4
+        }
+      }
+    ],
+    "growth": [
+      {
+        "id": "customer_growth",
+        "label": "Customer Growth",
+        "current": { "total": 61, "active": 58, "churning": 3 },
+        "trend": "+32.6%",
+        "trend_period": "YoY",
+        "monthly_new": [3, 2, 4, 5, 3, 6, 4, 3, 5, 4, 3, 4],
+        "by_region": {
+          "north_america": 24,
+          "europe": 22,
+          "asia_pacific": 10,
+          "middle_east": 4,
+          "latin_america": 1
+        },
+        "by_segment": {
+          "luxury_fragrance_house": 18,
+          "chemical_laboratory": 14,
+          "contract_manufacturer": 12,
+          "fragrance_conglomerate": 3,
+          "innovation_team": 8,
+          "rd_executive": 6
+        }
+      },
+      {
+        "id": "formula_success_rate",
+        "label": "Formula Success Rate",
+        "description": "Formulas that progressed from draft → approved and launched",
+        "current": 67.3,
+        "unit": "%",
+        "trend": "+5.1pp",
+        "trend_period": "QoQ",
+        "pipeline": {
+          "draft": 1240,
+          "under_review": 342,
+          "approved": 218,
+          "launched": 147,
+          "rejected": 89
+        },
+        "ai_assisted_vs_manual": {
+          "ai_assisted_success_rate": 73.1,
+          "manual_success_rate": 58.4,
+          "delta": "+14.7pp"
+        }
+      },
+      {
+        "id": "expansion_revenue",
+        "label": "Expansion Revenue",
+        "description": "Revenue from existing customer upgrades and add-ons",
+        "current": 42500,
+        "unit": "USD/month",
+        "trend": "+18.2%",
+        "trend_period": "QoQ",
+        "expansion_rate": 0.124
+      }
+    ],
+    "ai_performance": [
+      {
+        "id": "ai_usage",
+        "label": "AI Usage",
+        "description": "Monthly AI inference requests and user adoption",
+        "total_requests_monthly": 1250000,
+        "trend": "+41.2%",
+        "trend_period": "QoQ",
+        "by_type": {
+          "recommendations": 480000,
+          "predictions": 320000,
+          "optimization": 180000,
+          "rag_queries": 145000,
+          "similarity_searches": 85000,
+          "accord_generation": 40000
+        },
+        "active_ai_users": 312,
+        "ai_adoption_rate": 0.64,
+        "daily_active_ai_users": 145
+      },
+      {
+        "id": "prediction_accuracy",
+        "label": "Prediction Accuracy",
+        "description": "Weighted average accuracy across all production ML models",
+        "current": 87.9,
+        "unit": "%",
+        "trend": "+3.1pp",
+        "trend_period": "QoQ",
+        "target": 90,
+        "by_model": {
+          "similarity-gnn-v3": 91.8,
+          "commercial-lgbm-v2": 87.6,
+          "stability-xgb-v1": 84.3,
+          "sensory-transformer-v2": 89.1,
+          "accord-gan-v1": 86.2,
+          "trend-nlp-v1": 83.4
+        },
+        "calibration_ece": 0.027,
+        "drift_alert_count": 2,
+        "drift_alerts": [
+          { "model": "accord-gan-v1", "metric": "PSI", "value": 0.18, "threshold": 0.15, "date": "2026-06-28T14:00:00Z" },
+          { "model": "trend-nlp-v1", "metric": "KL_divergence", "value": 0.12, "threshold": 0.10, "date": "2026-06-30T09:00:00Z" }
+        ]
+      }
+    ],
+    "compliance": [
+      {
+        "id": "compliance_trends",
+        "label": "Compliance Health",
+        "current_rate": 94.8,
+        "unit": "%",
+        "trend": "+2.3pp",
+        "trend_period": "QoQ",
+        "total_formulas_checked": 12450,
+        "violations_found": 648,
+        "violations_resolved": 594,
+        "violations_outstanding": 54,
+        "by_regulation": {
+          "ifra": { "compliant": 96.2, "violations": 186 },
+          "reach": { "compliant": 92.1, "violations": 234 },
+          "clp": { "compliant": 94.8, "violations": 158 },
+          "regional": { "compliant": 91.4, "violations": 70 }
+        },
+        "regulatory_update_impact": {
+          "pending_ifra_amendments": 2,
+          "affected_formulas": 89,
+          "estimated_remediation_weeks": 3
+        }
+      }
+    ],
+    "operational": [
+      {
+        "id": "model_health",
+        "label": "Model Health Score",
+        "current": 91.2,
+        "unit": "/100",
+        "trend": "+2.1",
+        "trend_period": "QoQ",
+        "components": {
+          "accuracy_stability": 93,
+          "drift_resilience": 88,
+          "latency_performance": 95,
+          "uptime": 99.97
+        }
+      },
+      {
+        "id": "infrastructure_health",
+        "label": "Platform Health",
+        "current": 99.97,
+        "unit": "% uptime",
+        "trend": "+0.02pp",
+        "trend_period": "QoQ",
+        "incidents_last_30_days": 0,
+        "sev1_incidents": 0,
+        "sev2_incidents": 1
+      },
+      {
+        "id": "gpu_utilization",
+        "label": "GPU Utilization",
+        "current": 72.4,
+        "unit": "%",
+        "trend": "+8.2pp",
+        "trend_period": "QoQ",
+        "target_range": [65, 85],
+        "gpu_hours_monthly": 18400,
+        "gpu_cost_monthly": 52300
+      }
+    ],
+    "risk": [
+      {
+        "id": "churn_risk",
+        "label": "Churn Risk",
+        "at_risk_customers": 7,
+        "at_risk_mrr": 84200,
+        "risk_distribution": {
+          "high": { "customers": 2, "mrr_at_risk": 31200 },
+          "medium": { "customers": 3, "mrr_at_risk": 38500 },
+          "low": { "customers": 2, "mrr_at_risk": 14500 }
+        },
+        "top_risk_factors": [
+          { "factor": "Low AI adoption (< 20% of team)", "count": 4 },
+          { "factor": "No formulas created in 30+ days", "count": 3 },
+          { "factor": "Support ticket volume > 2 stdev above mean", "count": 2 },
+          { "factor": "Key champion departed organization", "count": 2 }
+        ]
+      },
+      {
+        "id": "renewal_risk",
+        "label": "Renewal Pipeline",
+        "upcoming_renewals_90_days": 14,
+        "at_risk_renewals": 3,
+        "renewal_value_at_risk": 248000,
+        "predicted_renewal_rate": 0.86,
+        "confidence": 0.78
+      },
+      {
+        "id": "expansion_opportunities",
+        "label": "Expansion Opportunities",
+        "qualified_opportunities": 12,
+        "pipeline_value": 1240000,
+        "by_type": {
+          "tier_upgrade": { "count": 5, "value": 580000 },
+          "seat_expansion": { "count": 4, "value": 290000 },
+          "addon_adoption": { "count": 3, "value": 370000 }
+        },
+        "top_opportunities": [
+          { "customer": "Maison Parfumée (Professional)", "opportunity": "Business upgrade + 15 seats + API add-on", "estimated_value": 324000 },
+          { "customer": "ChemLab International (Professional)", "opportunity": "Business upgrade + compliance module", "estimated_value": 275000 }
+        ]
+      }
+    ]
+  },
+  "ai_insights_feed": [
+    {
+      "id": "insight-001",
+      "timestamp": "2026-07-05T08:00:00Z",
+      "severity": "high",
+      "category": "revenue",
+      "title": "Enterprise upgrade trigger detected",
+      "body": "Maison Parfumée exceeded 250K API calls this month (+34% MoM) and added 8 seats. Current Professional plan will trigger overage charges on July 15. Recommend proactive upgrade to Business tier ($24,990/mo) — estimated 18% cost savings vs. overage charges. Contact: CTO expressed interest in June QBR.",
+      "action": "Schedule upgrade conversation",
+      "potential_revenue": 299880
+    },
+    {
+      "id": "insight-002",
+      "timestamp": "2026-07-05T07:30:00Z",
+      "severity": "high",
+      "category": "risk",
+      "title": "Churn risk: FragranceLab GmbH",
+      "body": "FragranceLab GmbH (Business tier, $24,990/mo) shows 3 consecutive risk signals: (1) no formulas created in 42 days, (2) primary admin account inactive for 18 days, (3) 4 support tickets unresolved. Customer health score dropped from 82 → 47. Historical churn probability for this pattern: 67%. Recommend immediate CSM outreach.",
+      "action": "CSM intervention required",
+      "potential_loss": 299880
+    },
+    {
+      "id": "insight-003",
+      "timestamp": "2026-07-05T06:00:00Z",
+      "severity": "medium",
+      "category": "product",
+      "title": "AI adoption lag in APAC segment",
+      "body": "APAC customers show 31% AI feature adoption vs. 68% global average. Drill-down reveals recommendation center usage is 12% vs 52% global. Correlates with higher manual formula failure rate (42% vs 26%). Hypothesis: Japanese and Korean UI localization gaps. Recommend: (1) localized onboarding flow for APAC, (2) Japanese-language knowledge base articles, (3) Tokyo-based customer workshop.",
+      "action": "Localization sprint + regional workshop",
+      "potential_impact": "Could unlock $480K ARR from APAC expansion"
+    },
+    {
+      "id": "insight-004",
+      "timestamp": "2026-07-04T22:00:00Z",
+      "severity": "medium",
+      "category": "ai",
+      "title": "Accord GAN drift alert — recalibration recommended",
+      "body": "accord-gan-v1 shows PSI of 0.18 (threshold: 0.15) with declining user acceptance (47% → 39% last 30 days). Diversity score also declining (0.61 → 0.54). Shadow model accord-gan-v2 shows 83% preference in blind A/B test. Recommend: promote v2 to champion next training cycle (July 12).",
+      "action": "Schedule model promotion",
+      "potential_impact": "Could increase accord generation adoption by 15%"
+    },
+    {
+      "id": "insight-005",
+      "timestamp": "2026-07-04T18:00:00Z",
+      "severity": "low",
+      "category": "market",
+      "title": "Gourmand trend accelerating",
+      "body": "Market intelligence shows 28% increase in gourmand vanilla-tonka search volume across all customers. Internal formula data confirms: 34 new gourmand formulas created in Q2 vs. 19 in Q1. Supply chain note: Vanillin prices up 8.3% QoQ due to demand. Recommend: (1) highlight gourmand accord templates in recommendation center, (2) secure Vanillin bulk pricing with 2 suppliers.",
+      "action": "Content update + procurement hedge",
+      "potential_impact": "Strategic positioning opportunity"
+    }
+  ],
+  "forecasting": {
+    "arr_forecast": {
+      "method": "Bayesian structural time series with customer cohort survival analysis",
+      "projections": [
+        { "month": "2026-07", "arr_low": 8640000, "arr_expected": 8850000, "arr_high": 9120000 },
+        { "month": "2026-08", "arr_low": 8820000, "arr_expected": 9100000, "arr_high": 9450000 },
+        { "month": "2026-09", "arr_low": 9050000, "arr_expected": 9400000, "arr_high": 9800000 },
+        { "month": "2026-10", "arr_low": 9280000, "arr_expected": 9700000, "arr_high": 10150000 },
+        { "month": "2026-11", "arr_low": 9520000, "arr_expected": 10000000, "arr_high": 10520000 },
+        { "month": "2026-12", "arr_low": 9780000, "arr_expected": 10350000, "arr_high": 10950000 }
+      ],
+      "confidence_interval": "80% prediction interval",
+      "key_assumptions": [
+        "Current 32.6% YoY growth rate with 0.92 decay factor per quarter",
+        "1 Enterprise deal in pipeline (75% close probability)",
+        "Attrition modeled at 1.2% monthly (actual trailing 6-month avg: 0.9%)"
+      ]
+    }
+  }
+}

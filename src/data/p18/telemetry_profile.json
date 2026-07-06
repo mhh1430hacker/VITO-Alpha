@@ -1,0 +1,128 @@
+{
+  "$schema": "p18/v1/telemetry_profile",
+  "version": "1.0.0",
+  "system": {
+    "name": "VITO Telemetry Engine",
+    "purpose": "Capture user behavior to drive AI-powered UX personalization, feature ranking, and product improvement",
+    "privacy": "GDPR/CCPA compliant. All user-identifiable data encrypted at rest. Aggregated analytics use differential privacy (ε=1.0). Tenant-isolated by default.",
+    "opt_out": "Available per-tenant and per-user. Telemetry collection halts immediately on opt-out.",
+    "data_retention": "Raw events: 90 days. Aggregated metrics: 36 months. Session recordings: 30 days (opt-in only)."
+  },
+  "events": [
+    {
+      "event_type": "page_view",
+      "description": "User navigates to a page",
+      "captured_fields": ["page_path", "referrer", "timestamp", "load_time_ms", "timezone_offset"],
+      "purpose": "Navigation path analysis, heatmap generation, feature importance weighting"
+    },
+    {
+      "event_type": "page_exit",
+      "description": "User leaves a page",
+      "captured_fields": ["page_path", "duration_ms", "scroll_depth_percent", "last_interaction_type", "exit_intent"],
+      "purpose": "Drop-off detection, content engagement scoring"
+    },
+    {
+      "event_type": "feature_usage",
+      "description": "User interacts with a specific feature",
+      "captured_fields": ["feature_id", "feature_name", "action_type (click/hover/submit/toggle)", "result", "error_code", "duration_ms"],
+      "purpose": "Feature adoption tracking, dead feature detection, ROI calculation per feature"
+    },
+    {
+      "event_type": "search_query",
+      "description": "User performs a search",
+      "captured_fields": ["query_text_hash", "search_type (global/material/formula/rag)", "result_count", "clicked_result_index", "search_duration_ms"],
+      "purpose": "Search relevance optimization, autocomplete improvement, knowledge gap detection"
+    },
+    {
+      "event_type": "command_palette_action",
+      "description": "User invokes Cmd+K command",
+      "captured_fields": ["command_id", "command_text_hash", "source (typed/selected)", "execution_success"],
+      "purpose": "Keyboard shortcut popularity, missing command detection"
+    },
+    {
+      "event_type": "ai_interaction",
+      "description": "User engages with AI features",
+      "captured_fields": ["ai_feature_type", "recommendation_type", "confidence_displayed", "user_action (accepted/rejected/modified/ignored)", "time_to_decision_ms"],
+      "purpose": "AI trust calibration, confidence threshold optimization, recommendation ranking"
+    },
+    {
+      "event_type": "formula_action",
+      "description": "User creates, edits, or deletes a formula",
+      "captured_fields": ["formula_id", "action", "ingredient_count", "duration_ms", "ai_assisted (bool)", "result_status"],
+      "purpose": "Workflow efficiency tracking, AI impact measurement"
+    },
+    {
+      "event_type": "sidebar_navigation",
+      "description": "User navigates via sidebar",
+      "captured_fields": ["target_page", "section_expanded", "method (click/keyboard)", "pinned_item (bool)", "recent_item (bool)"],
+      "purpose": "Navigation optimization, sidebar personalization, pin/recent effectiveness"
+    },
+    {
+      "event_type": "favorite_action",
+      "description": "User favorites, bookmarks, or pins an item",
+      "captured_fields": ["item_type", "item_id", "action (pin/unpin/favorite/unfavorite)", "context_page"],
+      "purpose": "Personalization signals, default view optimization"
+    },
+    {
+      "event_type": "error_encountered",
+      "description": "User encounters an error",
+      "captured_fields": ["error_type", "error_code", "page_path", "user_action_context", "recovery_action"],
+      "purpose": "Friction detection, error UX improvement, support prioritization"
+    },
+    {
+      "event_type": "session_start",
+      "description": "User begins a new session",
+      "captured_fields": ["device_type", "browser", "screen_resolution", "connection_type", "entry_page"],
+      "purpose": "Session analytics, device optimization, performance monitoring"
+    },
+    {
+      "event_type": "session_end",
+      "description": "User session ends (timeout or explicit logout)",
+      "captured_fields": ["session_duration_ms", "pages_visited_count", "features_used", "ai_interactions_count", "error_count", "task_completed (bool)"],
+      "purpose": "Session quality scoring, task completion rate, productivity measurement"
+    }
+  ],
+  "analytics_outputs": {
+    "heatmaps": {
+      "description": "Aggregated click and attention heatmaps for each page",
+      "method": "Kernel density estimation on click coordinates with time-weighting (30-day exponential decay)",
+      "output": "Heatmap overlays for UX review; identifies: dead zones (no interaction), rage clicks (rapid repeated clicks), and attention hotspots",
+      "visualization": "Overlay heatmap on page screenshot with intensity legend"
+    },
+    "behavior_clusters": {
+      "description": "User segmentation based on behavioral patterns",
+      "method": "K-means clustering (k=5) on normalized feature vectors: session_frequency, avg_session_duration, ai_adoption_rate, search_vs_browse_ratio, feature_diversity",
+      "clusters": [
+        { "id": "power_user", "label": "Power Users", "percentage": 18, "characteristics": "Daily usage, high AI adoption, uses keyboard shortcuts, creates 3+ formulas/week", "retention_risk": "low" },
+        { "id": "ai_enthusiast", "label": "AI Enthusiasts", "percentage": 24, "characteristics": "Heavy AI feature usage, moderate formula creation, explores experimental features", "retention_risk": "low" },
+        { "id": "traditionalist", "label": "Traditional Perfumers", "percentage": 31, "characteristics": "Manual formula creation, low AI adoption, high sidebar navigation, prefers library over wizard", "retention_risk": "medium" },
+        { "id": "browser", "label": "Dashboard Browsers", "percentage": 19, "characteristics": "Views dashboards, rarely creates formulas, short sessions, possible wrong persona", "retention_risk": "high" },
+        { "id": "idle", "label": "At-Risk / Idle", "percentage": 8, "characteristics": "Login frequency declining, no formula activity in 14+ days, long gaps between sessions", "retention_risk": "critical" }
+      ]
+    },
+    "navigation_optimization": {
+      "description": "AI-driven sidebar, breadcrumb, and quick-action optimization",
+      "method": "Markov chain model of navigation paths → PageRank for feature importance → Adaptive sidebar ordering",
+      "outputs": [
+        "Reorder sidebar sections by user frequency (per-user, updated weekly)",
+        "Surface 'next likely action' as inline suggestion",
+        "Auto-collapse sections with < 2% visit rate"
+      ]
+    },
+    "dashboard_personalization": {
+      "description": "Per-user dashboard widget ordering and content",
+      "method": "Multi-armed bandit (Thompson sampling) on widget engagement signals (click, hover, dwell time, interaction depth)",
+      "outputs": [
+        "Reorder dashboard widgets by predicted engagement",
+        "Show/hide widgets based on role + behavior",
+        "Adjust KPI thresholds based on user's historical attention patterns"
+      ]
+    },
+    "recommendation_ranking": {
+      "description": "Use telemetry to improve AI recommendation relevance",
+      "method": "LambdaMART learning-to-rank on recommendation acceptance/rejection history",
+      "feedback_loop": "Recommendation shown → User accepts/rejects/modifies → Acceptance signal feeds back into ranking model → Next recommendations re-ranked",
+      "metrics": ["NDCG@10 target > 0.82", "Acceptance rate target > 65%", "Time-to-accept target < 45s"]
+    }
+  }
+}

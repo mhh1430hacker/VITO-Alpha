@@ -1,0 +1,7 @@
+export { useIntelligence, useTrackPageView } from './hooks'
+export { useIntelligenceContext, IntelligenceProvider } from './provider'
+export { recordAction, checkStreak, getKnowledgeLevel, getSkillBadge, loadProgress } from './engine'
+export { ACHIEVEMENTS } from './achievements'
+export { getSuggestions } from './suggestions'
+export { isFirstRun, loadMission } from './first-mission'
+export type * from './types'
