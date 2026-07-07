@@ -14,7 +14,6 @@ import { PUBLIC_ROUTES } from '@/lib/routes'
 import { useIntelligenceContext } from '@/lib/intelligence'
 import { AchievementToast } from '@/components/intelligence/achievement-toast'
 import { Confetti } from '@/components/intelligence/confetti'
-import { AlphaBanner } from '@/components/alpha/alpha-banner'
 import { useAlpha } from '@/lib/alpha/provider'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -49,9 +48,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   const { lastUnlocked, clearLastUnlocked, progress } = useIntelligenceContext()
 
-  if (isPublic || isAlpha) return (
-    <>{isAlpha && <AlphaBanner />}{children}</>
-  )
+  if (isPublic || isAlpha) return <>{children}</>
 
   if (!hydrated) {
     return (
