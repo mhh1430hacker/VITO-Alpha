@@ -8,21 +8,6 @@ export default function AlphaFormPage() {
 
   return (
     <div className="min-h-screen bg-[#0A0D12]">
-      <motion.div
-        initial={{ y: -60, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        className="sticky top-0 z-50 w-full"
-      >
-        <div className="flex items-center justify-center gap-3 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 px-6 py-3 shadow-lg shadow-amber-500/20">
-          <span className="text-base">⚠️</span>
-          <p className="text-sm font-semibold text-white">
-            This is an alpha version for testing and feedback
-          </p>
-          <span className="text-base">⚠️</span>
-        </div>
-      </motion.div>
-
       <div className="mx-auto max-w-3xl px-4 py-8">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-white mb-2">VITO Alpha — Feedback Form</h1>
@@ -38,7 +23,7 @@ export default function AlphaFormPage() {
             </div>
           )}
           <iframe
-            src="https://forms.zoho.sa/mahdialhajjizoho1/form/VitoAlphaform"
+            src="https://docs.google.com/forms/d/e/1FAIpQLSe5LwmJ_ctfCrA7EzOIAeDJhSvWJlA1ZREbPt4FrSLn4DTdCA/viewform?embedded=true"
             width="100%"
             height="800"
             frameBorder="0"

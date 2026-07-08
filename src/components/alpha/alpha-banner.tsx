@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const FORM_URL = 'https://forms.zoho.sa/mahdialhajjizoho1/form/VitoAlphaform'
+const FORM_URL = 'https://forms.gle/t1ThHQcs5mjXHvv87'
 
 export function AlphaBanner() {
   const [showExitPopup, setShowExitPopup] = useState(false)
